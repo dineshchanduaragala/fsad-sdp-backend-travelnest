@@ -109,7 +109,7 @@ public class AdminServiceImpl implements AdminService
  public List<Booking> getAllBookings() { return bookingRepo.findAll(); }
 
  public List<Booking> getBookingsByStatus(String status) {
-  return bookingRepo.findByStatus(status);
+	 return bookingRepo.findByBookingStatus(status);
  }
 
  public List<Booking> getBookingsByPaymentStatus(String paymentStatus) {

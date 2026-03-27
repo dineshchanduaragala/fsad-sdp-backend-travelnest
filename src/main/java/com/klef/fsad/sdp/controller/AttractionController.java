@@ -1,55 +1,59 @@
-package com.klef.fsad.sdp.service;
+package com.klef.fsad.sdp.controller;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
 
 import com.klef.fsad.sdp.entity.Attraction;
-import com.klef.fsad.sdp.repository.AttractionRepository;
+import com.klef.fsad.sdp.service.AttractionService;
 
-@Service
-public class AttractionServiceImpl implements AttractionService
+@RestController
+@RequestMapping("/attractions")
+public class AttractionController 
 {
  @Autowired
- private AttractionRepository repo;
+ private AttractionService service;
 
- @Override
- public String addAttraction(Attraction a) 
+ // Add Attraction
+ @PostMapping("/add")
+ public String addAttraction(@RequestBody Attraction a)
  {
-  repo.save(a);
-  return "Attraction Added Successfully";
+  return service.addAttraction(a);
  }
 
- @Override
- public List<Attraction> getAllAttractions() 
+ // Get All Attractions
+ @GetMapping("/all")
+ public List<Attraction> getAllAttractions()
  {
-  return repo.findAll();
+  return service.getAllAttractions();
  }
 
- @Override
- public Attraction getAttractionById(int id) 
+ // Get By ID
+ @GetMapping("/{id}")
+ public Attraction getAttractionById(@PathVariable int id)
  {
-  return repo.findById(id).orElse(null);
+  return service.getAttractionById(id);
  }
 
- @Override
- public String updateAttraction(Attraction a) 
+ // Update
+ @PutMapping("/update")
+ public String updateAttraction(@RequestBody Attraction a)
  {
-  repo.save(a);
-  return "Attraction Updated Successfully";
+  return service.updateAttraction(a);
  }
 
- @Override
- public String deleteAttraction(int id) 
+ // Delete
+ @DeleteMapping("/delete/{id}")
+ public String deleteAttraction(@PathVariable int id)
  {
-  repo.deleteById(id);
-  return "Attraction Deleted Successfully";
+  return service.deleteAttraction(id);
  }
 
- @Override
- public List<Attraction> searchByLocation(String location) 
+ // Search by Location
+ @GetMapping("/search/{location}")
+ public List<Attraction> searchByLocation(@PathVariable String location)
  {
-  return repo.findByLocation(location);
+  return service.searchByLocation(location);
  }
 }

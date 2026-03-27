@@ -9,50 +9,45 @@ import com.klef.fsad.sdp.entity.Attraction;
 import com.klef.fsad.sdp.service.AttractionService;
 
 @RestController
-@RequestMapping("/attractions")
+@RequestMapping("attractionapi")
+@CrossOrigin("*")
 public class AttractionController 
 {
  @Autowired
  private AttractionService service;
 
- // Add Attraction
  @PostMapping("/add")
- public String addAttraction(@RequestBody Attraction a)
+ public String add(@RequestBody Attraction a)
  {
   return service.addAttraction(a);
  }
 
- // Get All Attractions
  @GetMapping("/all")
- public List<Attraction> getAllAttractions()
+ public List<Attraction> getAll()
  {
   return service.getAllAttractions();
  }
 
- // Get By ID
  @GetMapping("/{id}")
- public Attraction getAttractionById(@PathVariable int id)
+ public Attraction getById(@PathVariable int id)
  {
   return service.getAttractionById(id);
  }
 
- // Update
  @PutMapping("/update")
- public String updateAttraction(@RequestBody Attraction a)
+ public String update(@RequestBody Attraction a)
  {
   return service.updateAttraction(a);
  }
 
- // Delete
  @DeleteMapping("/delete/{id}")
- public String deleteAttraction(@PathVariable int id)
+ public String delete(@PathVariable int id)
  {
   return service.deleteAttraction(id);
  }
 
- // Search by Location
  @GetMapping("/search/{location}")
- public List<Attraction> searchByLocation(@PathVariable String location)
+ public List<Attraction> search(@PathVariable String location)
  {
   return service.searchByLocation(location);
  }

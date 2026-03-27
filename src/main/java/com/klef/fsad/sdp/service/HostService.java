@@ -1,5 +1,17 @@
 package com.klef.fsad.sdp.service;
 
-public interface HostService {
+import java.util.List;
+import com.klef.fsad.sdp.entity.Host;
 
+public interface HostService 
+{
+ String registerHost(Host h);
+
+ Host login(String email,String password);
+
+ List<Host> getAllHosts();
+
+ String updateHost(Host h);
+
+ String deleteHost(int id);
 }

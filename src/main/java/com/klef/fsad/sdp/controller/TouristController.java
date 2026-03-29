@@ -3,6 +3,7 @@ package com.klef.fsad.sdp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.klef.fsad.sdp.entity.*;
@@ -20,16 +21,24 @@ public class TouristController
  @PostMapping("/register")
  public String register(@RequestBody Tourist t)
  {
-  return service.register(t);
+	 service.register(t);
+	 return "Tourist Registered Successfully";
  }
 
- // LOGIN
  @PostMapping("/login")
- public Tourist login(@RequestBody Tourist t)
+ public ResponseEntity<?> login(@RequestBody Tourist t)
  {
-  return service.login(t.getEmail(), t.getPassword());
- }
+     Tourist user = service.login(t.getEmail(), t.getPassword());
 
+     if(user != null)
+     {
+         return ResponseEntity.ok(user);
+     }
+     else
+     {
+         return ResponseEntity.status(401).body("Invalid Credentials");
+     }
+ }
  // UPDATE PROFILE
  @PutMapping("/update")
  public String update(@RequestBody Tourist t)

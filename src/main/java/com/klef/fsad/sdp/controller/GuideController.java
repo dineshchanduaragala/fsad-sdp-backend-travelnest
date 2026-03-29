@@ -1,10 +1,9 @@
 package com.klef.fsad.sdp.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.klef.fsad.sdp.entity.Guide;
 import com.klef.fsad.sdp.service.GuideService;
 
@@ -25,16 +24,25 @@ public class GuideController
 
  // LOGIN
  @PostMapping("/login")
- public Guide login(@RequestBody Guide g)
+ public ResponseEntity<?> login(@RequestBody Guide g)
  {
-  return service.login(g.getEmail(), g.getPassword());
+     Guide user = service.login(g.getEmail(), g.getPassword());
+
+     if(user != null)
+     {
+         return ResponseEntity.ok(user);
+     }
+     else
+     {
+         return ResponseEntity.status(401).body("Invalid Credentials or Not Approved");
+     }
  }
 
- // VIEW ALL
+ // VIEW ALL APPROVED GUIDES (IMPORTANT FIX)
  @GetMapping("/all")
  public List<Guide> getAll()
  {
-  return service.getAllGuides();
+  return service.getApprovedGuides();
  }
 
  // UPDATE PROFILE
@@ -51,7 +59,7 @@ public class GuideController
   return service.deleteGuide(id);
  }
 
- // TOGGLE AVAILABILITY
+ // AVAILABILITY
  @PutMapping("/availability/{id}/{status}")
  public String updateAvailability(@PathVariable int id,@PathVariable boolean status)
  {

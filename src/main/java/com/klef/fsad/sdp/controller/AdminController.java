@@ -3,6 +3,7 @@ package com.klef.fsad.sdp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.klef.fsad.sdp.entity.*;
@@ -16,13 +17,24 @@ public class AdminController
  @Autowired
  private AdminService service;
 
- // LOGIN
+ // ================= LOGIN =================
  @PostMapping("/login")
- public Admin login(@RequestBody Admin admin) {
-  return service.verifyAdminLogin(admin.getUsername(), admin.getPassword());
+ public ResponseEntity<?> login(@RequestBody Admin admin) {
+
+     Admin user = service.verifyAdminLogin(
+         admin.getUsername(),
+         admin.getPassword(),
+         admin.getPin()
+     );
+
+     if(user != null) {
+         return ResponseEntity.ok(user);
+     } else {
+         return ResponseEntity.status(401).body("Invalid Credentials or PIN");
+     }
  }
 
- // DASHBOARD
+ // ================= DASHBOARD =================
  @GetMapping("/dashboard")
  public Object dashboard() {
   return new Object() {
@@ -35,7 +47,7 @@ public class AdminController
   };
  }
 
- // HOSTS
+ // ================= HOSTS =================
  @GetMapping("/hosts")
  public List<Host> allHosts() { return service.getAllHosts(); }
 
@@ -48,7 +60,7 @@ public class AdminController
  @PostMapping("/hosts/reject/{id}")
  public String rejectHost(@PathVariable int id) { return service.rejectHost(id); }
 
- // GUIDES
+ // ================= GUIDES =================
  @GetMapping("/guides")
  public List<Guide> allGuides() { return service.getAllGuides(); }
 
@@ -61,12 +73,22 @@ public class AdminController
  @PostMapping("/guides/reject/{id}")
  public String rejectGuide(@PathVariable int id) { return service.rejectGuide(id); }
 
- // HOMESTAYS
+ // ================= HOMESTAYS =================
  @GetMapping("/homestays")
  public List<Homestay> allHomestays() { return service.getAllHomestays(); }
 
  @GetMapping("/homestays/pending")
  public List<Homestay> pendingHomestays() { return service.getPendingHomestays(); }
+
+ // ✅ FIX ADDED (IMPORTANT)
+ @PostMapping("/homestays")
+ public String addHomestay(@RequestBody Homestay h) {
+  return service.addHomestay(h);
+ }
+ @PutMapping("/homestays")
+ public String updateHomestay(@RequestBody Homestay h) {
+     return service.updateHomestay(h);
+ }
 
  @PostMapping("/homestays/approve/{id}")
  public String approveHomestay(@PathVariable int id) { return service.approveHomestay(id); }
@@ -77,9 +99,19 @@ public class AdminController
  @DeleteMapping("/homestays/{id}")
  public String deleteHomestay(@PathVariable int id) { return service.deleteHomestay(id); }
 
- // ATTRACTIONS
+ // ================= ATTRACTIONS =================
  @GetMapping("/attractions")
  public List<Attraction> attractions() { return service.getAllAttractions(); }
+
+ // ✅ OPTIONAL (VERY USEFUL FOR EDIT PAGE)
+ @GetMapping("/attractions/{id}")
+ public Attraction getAttractionById(@PathVariable int id) {
+  return service.getAllAttractions()
+         .stream()
+         .filter(a -> a.getId() == id)
+         .findFirst()
+         .orElse(null);
+ }
 
  @PostMapping("/attractions")
  public String addAttraction(@RequestBody Attraction a) { return service.addAttraction(a); }
@@ -90,7 +122,7 @@ public class AdminController
  @DeleteMapping("/attractions/{id}")
  public String deleteAttraction(@PathVariable int id) { return service.deleteAttraction(id); }
 
- // BOOKINGS
+ // ================= BOOKINGS =================
  @GetMapping("/bookings")
  public List<Booking> bookings() { return service.getAllBookings(); }
 

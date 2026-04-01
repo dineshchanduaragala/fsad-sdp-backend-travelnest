@@ -21,16 +21,13 @@ public class Homestay
  @Column(length = 500)
  private String facilities;
 
- @Column(length = 100000)
- private String image;   // base64
-
- @Column(length = 100000)
- private String upiQR;   // QR image
+ // ✅ CHANGED
+ private String imagePath;
+ private String qrPath;
 
  private boolean available;
  private boolean approved;
 
- // 🔗 Link with Host
  private int hostId;
 
  // GETTERS & SETTERS
@@ -53,11 +50,11 @@ public class Homestay
  public String getFacilities() { return facilities; }
  public void setFacilities(String facilities) { this.facilities = facilities; }
 
- public String getImage() { return image; }
- public void setImage(String image) { this.image = image; }
+ public String getImagePath() { return imagePath; }
+ public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
- public String getUpiQR() { return upiQR; }
- public void setUpiQR(String upiQR) { this.upiQR = upiQR; }
+ public String getQrPath() { return qrPath; }
+ public void setQrPath(String qrPath) { this.qrPath = qrPath; }
 
  public boolean isAvailable() { return available; }
  public void setAvailable(boolean available) { this.available = available; }

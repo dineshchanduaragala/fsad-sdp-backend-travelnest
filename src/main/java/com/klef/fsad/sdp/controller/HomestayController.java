@@ -4,85 +4,120 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;   // ✅ IMPORTANT
 
 import com.klef.fsad.sdp.entity.Homestay;
 import com.klef.fsad.sdp.service.HomestayService;
+import com.klef.fsad.sdp.util.FileUploadUtil;
 
 @RestController
 @RequestMapping("homestayapi")
 @CrossOrigin("*")
 public class HomestayController 
 {
- @Autowired
- private HomestayService service;
+    @Autowired
+    private HomestayService service;
 
- // ADD (Host)
- @PostMapping("/add")
- public String add(@RequestBody Homestay h)
- {
-  return service.addHomestay(h);
- }
+    @PostMapping("/add")
+    public String add(
+        @RequestParam String name,
+        @RequestParam String location,
+        @RequestParam String description,
+        @RequestParam double price,
+        @RequestParam String facilities,
+        @RequestParam int hostId,
+        @RequestParam(required = false) MultipartFile image,
+        @RequestParam(required = false) MultipartFile qr
+    ) {
+        try {
 
- // VIEW ALL (Admin)
- @GetMapping("/all")
- public List<Homestay> getAll()
- {
-  return service.getAllHomestays();
- }
+            String imagePath = (image != null) ? FileUploadUtil.saveFile(image, "homestays") : null;
+            String qrPath = (qr != null) ? FileUploadUtil.saveFile(qr, "qr") : null;
 
- // VIEW APPROVED (Tourist)
- @GetMapping("/approved")
- public List<Homestay> getApproved()
- {
-  return service.getApprovedHomestays();
- }
+            Homestay h = new Homestay();
+            h.setName(name);
+            h.setLocation(location);
+            h.setDescription(description);
+            h.setPrice(price);
+            h.setFacilities(facilities);
+            h.setHostId(hostId);
+            h.setImagePath(imagePath);
+            h.setQrPath(qrPath);
 
- // VIEW BY ID
- @GetMapping("/{id}")
- public Homestay getById(@PathVariable int id)
- {
-  return service.getById(id);
- }
+            return service.addHomestay(h);
 
- // UPDATE
- @PutMapping("/update")
- public String update(@RequestBody Homestay h)
- {
-  return service.updateHomestay(h);
- }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Upload Failed";
+        }
+    }
+    @PostMapping("/admin/add")
+    public String addByAdmin(@RequestBody Homestay h)
+    {
+        h.setApproved(true);  // ✅ Direct approval
+        return service.addHomestay(h);
+    }
 
- // DELETE
- @DeleteMapping("/delete/{id}")
- public String delete(@PathVariable int id)
- {
-  return service.deleteHomestay(id);
- }
+    // ✅ VIEW ALL (Admin)
+    @GetMapping("/all")
+    public List<Homestay> getAll()
+    {
+        return service.getAllHomestays();
+    }
 
- // APPROVE (Admin)
- @PutMapping("/approve/{id}")
- public String approve(@PathVariable int id)
- {
-  return service.approveHomestay(id);
- }
+    // ✅ VIEW APPROVED (Tourist)
+    @GetMapping("/approved")
+    public List<Homestay> getApproved()
+    {
+        return service.getApprovedHomestays();
+    }
 
- // REJECT (Admin)
- @DeleteMapping("/reject/{id}")
- public String reject(@PathVariable int id)
- {
-  return service.rejectHomestay(id);
- }
+    // ✅ VIEW BY ID
+    @GetMapping("/{id}")
+    public Homestay getById(@PathVariable int id)
+    {
+        return service.getById(id);
+    }
 
- // SEARCH (Tourist)
- @GetMapping("/search/{location}")
- public List<Homestay> search(@PathVariable String location)
- {
-  return service.searchByLocation(location);
- }
+    // ⚠️ UPDATE (No image update here – keep simple)
+    @PutMapping("/update")
+    public String update(@RequestBody Homestay h)
+    {
+        return service.updateHomestay(h);
+    }
 
- // HOST HOMESTAYS
- @GetMapping("/host/{hostId}")
- public List<Homestay> getHostHomestays(@PathVariable int hostId)
- {
-  return service.getHostHomestays(hostId);
- }
+    // ✅ DELETE
+    @DeleteMapping("/delete/{id}")
+    public String delete(@PathVariable int id)
+    {
+        return service.deleteHomestay(id);
+    }
+
+    // ✅ APPROVE (Admin)
+    @PutMapping("/approve/{id}")
+    public String approve(@PathVariable int id)
+    {
+        return service.approveHomestay(id);
+    }
+
+    // ✅ REJECT (Admin)
+    @DeleteMapping("/reject/{id}")
+    public String reject(@PathVariable int id)
+    {
+        return service.rejectHomestay(id);
+    }
+
+    // ✅ SEARCH (Tourist)
+    @GetMapping("/search/{location}")
+    public List<Homestay> search(@PathVariable String location)
+    {
+        return service.searchByLocation(location);
+    }
+
+    // ✅ HOST HOMESTAYS
+    @GetMapping("/host/{hostId}")
+    public List<Homestay> getHostHomestays(@PathVariable int hostId)
+    {
+        return service.getHostHomestays(hostId);
+    }
 }

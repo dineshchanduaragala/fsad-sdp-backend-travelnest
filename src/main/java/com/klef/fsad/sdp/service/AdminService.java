@@ -6,8 +6,7 @@ import com.klef.fsad.sdp.entity.*;
 public interface AdminService 
 {
  // LOGIN
- Admin verifyAdminLogin(String email,String pin);
-
+	public Admin verifyAdminLogin(String username, String password, String pin);
  // DASHBOARD
  long getTotalTourists();
  long getTotalHosts();
@@ -37,6 +36,8 @@ public interface AdminService
  String approveHomestay(int id);
  String rejectHomestay(int id);
  String deleteHomestay(int id);
+ String updateHomestay(Homestay h);
+ String addHomestay(Homestay h);
 
  // ATTRACTIONS
  List<Attraction> getAllAttractions();

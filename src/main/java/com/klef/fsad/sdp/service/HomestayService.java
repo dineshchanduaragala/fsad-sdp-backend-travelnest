@@ -6,6 +6,7 @@ import com.klef.fsad.sdp.entity.Homestay;
 public interface HomestayService 
 {
  String addHomestay(Homestay h);
+ String addHomestayByAdmin(Homestay h);
 
  List<Homestay> getAllHomestays();
 

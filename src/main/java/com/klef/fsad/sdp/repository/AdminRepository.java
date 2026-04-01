@@ -7,5 +7,6 @@ import com.klef.fsad.sdp.entity.Admin;
 @Repository
 public interface AdminRepository extends JpaRepository<Admin,String>
 {
- Admin findByUsernameAndPassword(String username,String password);
+    // ✅ UPDATED METHOD WITH PIN
+    Admin findByUsernameAndPasswordAndPin(String username, String password, String pin);
 }

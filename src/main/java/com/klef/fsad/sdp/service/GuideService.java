@@ -16,4 +16,5 @@ public interface GuideService
  String deleteGuide(int id);
 
  String toggleAvailability(int id, boolean status);
+ List<Guide> getApprovedGuides();
 }

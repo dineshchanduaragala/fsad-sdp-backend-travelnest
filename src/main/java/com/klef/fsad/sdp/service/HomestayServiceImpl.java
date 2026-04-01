@@ -15,14 +15,25 @@ public class HomestayServiceImpl implements HomestayService
  private HomestayRepository repo;
 
  @Override
+//HOST
  public String addHomestay(Homestay h) 
  {
-  h.setApproved(false);   // Admin approval needed
-  h.setAvailable(true);
+     if (!h.isApproved()) {   // ✅ Only set false if not already true
+         h.setApproved(false);
+     }
 
-  repo.save(h);
-  return "Homestay Added (Waiting for Approval)";
+     h.setAvailable(true);
+
+     repo.save(h);
+     return "Homestay Added";
  }
+
+//ADMIN
+public String addHomestayByAdmin(Homestay h) {
+  h.setApproved(true);
+  repo.save(h);
+  return "Added by admin";
+}
 
  @Override
  public List<Homestay> getAllHomestays() 
@@ -52,8 +63,12 @@ public class HomestayServiceImpl implements HomestayService
  @Override
  public String deleteHomestay(int id) 
  {
-  repo.deleteById(id);
-  return "Homestay Deleted Successfully";
+     try {
+         repo.deleteById(id);
+         return "Deleted";
+     } catch (Exception e) {
+         return "Cannot delete: Homestay has bookings";
+     }
  }
 
  @Override

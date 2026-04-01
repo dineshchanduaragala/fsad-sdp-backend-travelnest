@@ -12,6 +12,8 @@ public class Admin
 
  @Column(nullable = false)
  private String password;
+ @Column(nullable = false)
+ private String pin;
 
  public String getUsername() {
 	return username;
@@ -27,6 +29,14 @@ public class Admin
 
  public void setPassword(String password) {
 	this.password = password;
+ }
+
+ public String getPin() {
+	return pin;
+ }
+
+ public void setPin(String pin) {
+	this.pin = pin;
  }
  
 }

@@ -17,7 +17,7 @@ public class GuideServiceImpl implements GuideService
  @Override
  public String registerGuide(Guide g) 
  {
-  g.setApproved(false);   // Needs Admin approval
+  g.setApproved(false);   // Admin approval required
   g.setAvailable(true);
 
   repo.save(g);
@@ -27,13 +27,20 @@ public class GuideServiceImpl implements GuideService
  @Override
  public Guide login(String email, String password) 
  {
-  return repo.findByEmailAndPassword(email,password);
+  // ✅ Only approved guides can login
+  return repo.findByEmailAndPasswordAndApproved(email, password, true);
  }
 
  @Override
  public List<Guide> getAllGuides() 
  {
   return repo.findAll();
+ }
+
+ @Override
+ public List<Guide> getApprovedGuides() 
+ {
+  return repo.findByApproved(true);
  }
 
  @Override

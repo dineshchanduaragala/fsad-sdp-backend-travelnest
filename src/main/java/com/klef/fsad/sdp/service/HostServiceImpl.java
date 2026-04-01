@@ -27,7 +27,8 @@ public class HostServiceImpl implements HostService
  @Override
  public Host login(String email, String password) 
  {
-  return repo.findByEmailAndPassword(email,password);
+  // ✅ FIXED
+  return repo.findByEmailAndPasswordAndApproved(email, password, true);
  }
 
  @Override

@@ -21,9 +21,15 @@ public class AdminServiceImpl implements AdminService
 
  // LOGIN
  @Override
- public Admin verifyAdminLogin(String email, String pin) 
- {
-  return adminRepo.findByUsernameAndPassword(email, pin);
+ public Admin verifyAdminLogin(String username, String password, String pin) {
+
+     Admin admin = adminRepo.findByUsernameAndPasswordAndPin(username, password, pin);
+
+     if (admin != null && admin.getPin().equals(pin)) {
+         return admin;
+     }
+
+     return null;
  }
 
  // DASHBOARD
@@ -86,6 +92,17 @@ public class AdminServiceImpl implements AdminService
   homestayRepo.deleteById(id);
   return "Deleted";
  }
+
+ public String updateHomestay(Homestay h) {
+     homestayRepo.save(h);
+     return "Updated";
+ }
+ public String addHomestay(Homestay h) {
+	    h.setApproved(true);
+	    homestayRepo.save(h);
+	    return "Added";
+	}
+ 
 
  // ATTRACTIONS
  public List<Attraction> getAllAttractions() { return attractionRepo.findAll(); }

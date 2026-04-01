@@ -3,6 +3,7 @@ package com.klef.fsad.sdp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.klef.fsad.sdp.entity.Host;
@@ -23,11 +24,19 @@ public class HostController
   return service.registerHost(h);
  }
 
- // LOGIN
  @PostMapping("/login")
- public Host login(@RequestBody Host h)
+ public ResponseEntity<?> login(@RequestBody Host h)
  {
-  return service.login(h.getEmail(), h.getPassword());
+     Host user = service.login(h.getEmail(), h.getPassword());
+
+     if(user != null)
+     {
+         return ResponseEntity.ok(user);
+     }
+     else
+     {
+         return ResponseEntity.status(401).body("Invalid Credentials or Not Approved");
+     }
  }
 
  // VIEW ALL
@@ -50,4 +59,6 @@ public class HostController
  {
   return service.deleteHost(id);
  }
+ 
+ 
 }

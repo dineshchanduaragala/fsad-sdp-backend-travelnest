@@ -19,8 +19,8 @@ public class Attraction
  @Column(length=500)
  private String description;
 
- @Column(length=100000) // Base64 Image
- private String image;
+ // ✅ CHANGED
+ private String imagePath;
 
  private double entryFee;
  private String timings;
@@ -39,8 +39,8 @@ public class Attraction
  public String getDescription() { return description; }
  public void setDescription(String description) { this.description = description; }
 
- public String getImage() { return image; }
- public void setImage(String image) { this.image = image; }
+ public String getImagePath() { return imagePath; }
+ public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
  public double getEntryFee() { return entryFee; }
  public void setEntryFee(double entryFee) { this.entryFee = entryFee; }

@@ -11,6 +11,7 @@ import com.klef.fsad.sdp.service.BookingService;
 @RestController
 @RequestMapping("bookingapi")
 @CrossOrigin("*")
+
 public class BookingController 
 {
  @Autowired

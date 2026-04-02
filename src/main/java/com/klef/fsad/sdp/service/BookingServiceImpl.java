@@ -14,7 +14,6 @@ public class BookingServiceImpl implements BookingService
  @Autowired
  private BookingRepository repo;
 
- // CREATE BOOKING (Tourist)
  @Override
  public String createBooking(Booking b) 
  {

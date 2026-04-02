@@ -17,7 +17,6 @@ public class TouristController
  @Autowired
  private TouristService service;
 
- // REGISTER
  @PostMapping("/register")
  public String register(@RequestBody Tourist t)
  {
@@ -39,42 +38,38 @@ public class TouristController
          return ResponseEntity.status(401).body("Invalid Credentials");
      }
  }
- // UPDATE PROFILE
+ 
  @PutMapping("/update")
  public String update(@RequestBody Tourist t)
  {
   return service.updateProfile(t);
  }
 
- // VIEW HOMESTAYS
+ 
  @GetMapping("/homestays")
  public List<Homestay> homestays()
  {
   return service.viewHomestays();
  }
 
- // SEARCH HOMESTAYS
  @GetMapping("/homestays/search/{location}")
  public List<Homestay> searchHomestays(@PathVariable String location)
  {
   return service.searchHomestays(location);
  }
 
- // VIEW ATTRACTIONS
  @GetMapping("/attractions")
  public List<Attraction> attractions()
  {
   return service.viewAttractions();
  }
 
- // SEARCH ATTRACTIONS
  @GetMapping("/attractions/search/{location}")
  public List<Attraction> searchAttractions(@PathVariable String location)
  {
   return service.searchAttractions(location);
  }
 
- // VIEW GUIDES
  @GetMapping("/guides")
  public List<Guide> guides()
  {

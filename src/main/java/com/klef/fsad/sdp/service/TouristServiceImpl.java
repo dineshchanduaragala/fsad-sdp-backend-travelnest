@@ -11,12 +11,15 @@ import com.klef.fsad.sdp.repository.*;
 @Service
 public class TouristServiceImpl implements TouristService
 {
- @Autowired private TouristRepository touristRepo;
- @Autowired private HomestayRepository homestayRepo;
- @Autowired private AttractionRepository attractionRepo;
- @Autowired private GuideRepository guideRepo;
+ @Autowired 
+ private TouristRepository touristRepo;
+ @Autowired 
+ private HomestayRepository homestayRepo;
+ @Autowired 
+ private AttractionRepository attractionRepo;
+ @Autowired 
+ private GuideRepository guideRepo;
 
- // REGISTER
  @Override
  public String register(Tourist t) 
  {
@@ -24,14 +27,12 @@ public class TouristServiceImpl implements TouristService
   return "Tourist Registered Successfully";
  }
 
- // LOGIN
  @Override
  public Tourist login(String email, String password) 
  {
   return touristRepo.findByEmailAndPassword(email,password);
  }
 
- // UPDATE PROFILE
  @Override
  public String updateProfile(Tourist t) 
  {
@@ -39,7 +40,6 @@ public class TouristServiceImpl implements TouristService
   return "Profile Updated Successfully";
  }
 
- // HOMESTAYS
  @Override
  public List<Homestay> viewHomestays() 
  {
@@ -52,7 +52,6 @@ public class TouristServiceImpl implements TouristService
   return homestayRepo.findByLocation(location);
  }
 
- // ATTRACTIONS
  @Override
  public List<Attraction> viewAttractions() 
  {
@@ -65,7 +64,6 @@ public class TouristServiceImpl implements TouristService
   return attractionRepo.findByLocation(location);
  }
 
- // GUIDES
  @Override
  public List<Guide> viewGuides() 
  {

@@ -18,33 +18,52 @@ public class Attraction
 
  @Column(length=500)
  private String description;
-
- // ✅ CHANGED
  private String imagePath;
 
  private double entryFee;
  private String timings;
-
- // GETTERS & SETTERS
-
- public int getId() { return id; }
- public void setId(int id) { this.id = id; }
-
- public String getName() { return name; }
- public void setName(String name) { this.name = name; }
-
- public String getLocation() { return location; }
- public void setLocation(String location) { this.location = location; }
-
- public String getDescription() { return description; }
- public void setDescription(String description) { this.description = description; }
-
- public String getImagePath() { return imagePath; }
- public void setImagePath(String imagePath) { this.imagePath = imagePath; }
-
- public double getEntryFee() { return entryFee; }
- public void setEntryFee(double entryFee) { this.entryFee = entryFee; }
-
- public String getTimings() { return timings; }
- public void setTimings(String timings) { this.timings = timings; }
+ 
+ public int getId() {
+	return id;
+ }
+ public void setId(int id) {
+	this.id = id;
+ }
+ public String getName() {
+	return name;
+ }
+ public void setName(String name) {
+	this.name = name;
+ }
+ public String getLocation() {
+	return location;
+ }
+ public void setLocation(String location) {
+	this.location = location;
+ }
+ public String getDescription() {
+	return description;
+ }
+ public void setDescription(String description) {
+	this.description = description;
+ }
+ public String getImagePath() {
+	return imagePath;
+ }
+ public void setImagePath(String imagePath) {
+	this.imagePath = imagePath;
+ }
+ public double getEntryFee() {
+	return entryFee;
+ }
+ public void setEntryFee(double entryFee) {
+	this.entryFee = entryFee;
+ }
+ public String getTimings() {
+	return timings;
+ }
+ public void setTimings(String timings) {
+	this.timings = timings;
+ }
+ 
 }

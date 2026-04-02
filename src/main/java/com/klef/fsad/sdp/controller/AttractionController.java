@@ -18,7 +18,6 @@ public class AttractionController
  @Autowired
  private AttractionService service;
 
- // ✅ ADD WITH IMAGE
  @PostMapping("/add")
  public String add(
      @RequestParam String name,
@@ -49,36 +48,31 @@ public class AttractionController
    return "Upload Failed";
   }
  }
-
- // VIEW ALL
+ 
  @GetMapping("/all")
  public List<Attraction> getAll()
  {
   return service.getAllAttractions();
  }
 
- // VIEW BY ID
  @GetMapping("/{id}")
  public Attraction getById(@PathVariable int id)
  {
   return service.getAttractionById(id);
  }
 
- // UPDATE (no image update)
  @PutMapping("/update")
  public String update(@RequestBody Attraction a)
  {
   return service.updateAttraction(a);
  }
 
- // DELETE
  @DeleteMapping("/delete/{id}")
  public String delete(@PathVariable int id)
  {
   return service.deleteAttraction(id);
  }
 
- // SEARCH
  @GetMapping("/search/{location}")
  public List<Attraction> search(@PathVariable String location)
  {

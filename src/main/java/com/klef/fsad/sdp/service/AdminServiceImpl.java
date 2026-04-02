@@ -11,13 +11,20 @@ import com.klef.fsad.sdp.repository.*;
 @Service
 public class AdminServiceImpl implements AdminService
 {
- @Autowired private AdminRepository adminRepo;
- @Autowired private TouristRepository touristRepo;
- @Autowired private HostRepository hostRepo;
- @Autowired private GuideRepository guideRepo;
- @Autowired private HomestayRepository homestayRepo;
- @Autowired private AttractionRepository attractionRepo;
- @Autowired private BookingRepository bookingRepo;
+ @Autowired 
+ private AdminRepository adminRepo;
+ @Autowired 
+ private TouristRepository touristRepo;
+ @Autowired 
+ private HostRepository hostRepo;
+ @Autowired 
+ private GuideRepository guideRepo;
+ @Autowired 
+ private HomestayRepository homestayRepo;
+ @Autowired 
+ private AttractionRepository attractionRepo;
+ @Autowired 
+ private BookingRepository bookingRepo;
 
  // LOGIN
  @Override
@@ -28,24 +35,56 @@ public class AdminServiceImpl implements AdminService
      if (admin != null && admin.getPin().equals(pin)) {
          return admin;
      }
-
      return null;
  }
 
  // DASHBOARD
- public long getTotalTourists() { return touristRepo.count(); }
- public long getTotalHosts() { return hostRepo.count(); }
- public long getTotalGuides() { return guideRepo.count(); }
- public long getTotalHomestays() { return homestayRepo.count(); }
- public long getTotalAttractions() { return attractionRepo.count(); }
- public long getTotalBookings() { return bookingRepo.count(); }
+ public long getTotalTourists() 
+ { 
+	 return touristRepo.count();
+ }
+ 
+ public long getTotalHosts() 
+ { 
+	 return hostRepo.count();
+ }
+ 
+ public long getTotalGuides() 
+ { 
+	 return guideRepo.count();
+ }
+ 
+ public long getTotalHomestays() 
+ { 
+	 return homestayRepo.count();
+ }
+ 
+ public long getTotalAttractions() 
+ { 
+	 return attractionRepo.count();
+ }
+ 
+ public long getTotalBookings() 
+ { 
+	 return bookingRepo.count();
+ }
 
  // TOURISTS
- public List<Tourist> viewAllTourists() { return touristRepo.findAll(); }
+ public List<Tourist> viewAllTourists() 
+ { 
+	 return touristRepo.findAll();
+ }
 
  // HOSTS
- public List<Host> getPendingHosts() { return hostRepo.findByApproved(false); }
- public List<Host> getAllHosts() { return hostRepo.findAll(); }
+ public List<Host> getPendingHosts() 
+ { 
+	 return hostRepo.findByApproved(false);
+ }
+ 
+ public List<Host> getAllHosts() 
+ { 
+	 return hostRepo.findAll();
+ }
 
  public String approveHost(int id) {
   Host h = hostRepo.findById(id).orElse(null);
@@ -59,8 +98,15 @@ public class AdminServiceImpl implements AdminService
  }
 
  // GUIDES
- public List<Guide> getPendingGuides() { return guideRepo.findByApproved(false); }
- public List<Guide> getAllGuides() { return guideRepo.findAll(); }
+ public List<Guide> getPendingGuides() 
+ { 
+	 return guideRepo.findByApproved(false);
+ }
+ 
+ public List<Guide> getAllGuides() 
+ { 
+	 return guideRepo.findAll();
+ }
 
  public String approveGuide(int id) {
   Guide g = guideRepo.findById(id).orElse(null);
@@ -74,10 +120,17 @@ public class AdminServiceImpl implements AdminService
  }
 
  // HOMESTAYS
- public List<Homestay> getPendingHomestays() { return homestayRepo.findByApproved(false); }
- public List<Homestay> getAllHomestays() { return homestayRepo.findAll(); }
+ public List<Homestay> getPendingHomestays() 
+ { 
+	 return homestayRepo.findByApproved(false);
+ }
+ 
+ public List<Homestay> getAllHomestays() 
+ { 
+	 return homestayRepo.findAll();
+ }
 
- public String approveHomestay(int id) {
+ public String approveHomestay(int id){
   Homestay h = homestayRepo.findById(id).orElse(null);
   if(h!=null){ h.setApproved(true); homestayRepo.save(h); return "Approved"; }
   return "Not Found";
@@ -105,7 +158,10 @@ public class AdminServiceImpl implements AdminService
  
 
  // ATTRACTIONS
- public List<Attraction> getAllAttractions() { return attractionRepo.findAll(); }
+ public List<Attraction> getAllAttractions() 
+ { 
+	 return attractionRepo.findAll();
+ }
 
  public String addAttraction(Attraction a) {
   attractionRepo.save(a);
@@ -123,7 +179,10 @@ public class AdminServiceImpl implements AdminService
  }
 
  // BOOKINGS
- public List<Booking> getAllBookings() { return bookingRepo.findAll(); }
+ public List<Booking> getAllBookings() 
+ { 
+	 return bookingRepo.findAll();
+ }
 
  public List<Booking> getBookingsByStatus(String status) {
 	 return bookingRepo.findByBookingStatus(status);

@@ -17,7 +17,7 @@ public class AdminController
  @Autowired
  private AdminService service;
 
- // ================= LOGIN =================
+ //LOGIN
  @PostMapping("/login")
  public ResponseEntity<?> login(@RequestBody Admin admin) {
 
@@ -34,7 +34,7 @@ public class AdminController
      }
  }
 
- // ================= DASHBOARD =================
+ // DASHBOARD
  @GetMapping("/dashboard")
  public Object dashboard() {
   return new Object() {
@@ -47,63 +47,104 @@ public class AdminController
   };
  }
 
- // ================= HOSTS =================
+ // HOSTS
  @GetMapping("/hosts")
- public List<Host> allHosts() { return service.getAllHosts(); }
+ public List<Host> allHosts() 
+ { 
+	 return service.getAllHosts();
+ }
 
  @GetMapping("/hosts/pending")
- public List<Host> pendingHosts() { return service.getPendingHosts(); }
+ public List<Host> pendingHosts() 
+ { 
+	 return service.getPendingHosts();
+ }
 
  @PostMapping("/hosts/approve/{id}")
- public String approveHost(@PathVariable int id) { return service.approveHost(id); }
+ public String approveHost(@PathVariable int id) 
+ { 
+	 return service.approveHost(id);
+ }
 
  @PostMapping("/hosts/reject/{id}")
- public String rejectHost(@PathVariable int id) { return service.rejectHost(id); }
+ public String rejectHost(@PathVariable int id) 
+ { 
+	 return service.rejectHost(id);
+ }
 
- // ================= GUIDES =================
+ // GUIDES
  @GetMapping("/guides")
- public List<Guide> allGuides() { return service.getAllGuides(); }
+ public List<Guide> allGuides() 
+ { 
+	 return service.getAllGuides();
+ }
 
  @GetMapping("/guides/pending")
- public List<Guide> pendingGuides() { return service.getPendingGuides(); }
+ public List<Guide> pendingGuides() 
+ { 
+	 return service.getPendingGuides();
+ }
 
  @PostMapping("/guides/approve/{id}")
- public String approveGuide(@PathVariable int id) { return service.approveGuide(id); }
+ public String approveGuide(@PathVariable int id) 
+ { 
+	 return service.approveGuide(id);
+ }
 
  @PostMapping("/guides/reject/{id}")
- public String rejectGuide(@PathVariable int id) { return service.rejectGuide(id); }
+ public String rejectGuide(@PathVariable int id) 
+ { 
+	 return service.rejectGuide(id);
+ }
 
- // ================= HOMESTAYS =================
+ // HOMESTAYS
  @GetMapping("/homestays")
- public List<Homestay> allHomestays() { return service.getAllHomestays(); }
+ public List<Homestay> allHomestays() 
+ { 
+	 return service.getAllHomestays();
+ }
 
  @GetMapping("/homestays/pending")
- public List<Homestay> pendingHomestays() { return service.getPendingHomestays(); }
+ public List<Homestay> pendingHomestays() 
+ { 
+	 return service.getPendingHomestays();
+ }
 
- // ✅ FIX ADDED (IMPORTANT)
  @PostMapping("/homestays")
  public String addHomestay(@RequestBody Homestay h) {
   return service.addHomestay(h);
  }
+ 
  @PutMapping("/homestays")
  public String updateHomestay(@RequestBody Homestay h) {
      return service.updateHomestay(h);
  }
 
  @PostMapping("/homestays/approve/{id}")
- public String approveHomestay(@PathVariable int id) { return service.approveHomestay(id); }
+ public String approveHomestay(@PathVariable int id) 
+ { 
+	 return service.approveHomestay(id);
+ }
 
  @PostMapping("/homestays/reject/{id}")
- public String rejectHomestay(@PathVariable int id) { return service.rejectHomestay(id); }
+ public String rejectHomestay(@PathVariable int id) 
+ { 
+	 return service.rejectHomestay(id);
+ }
 
  @DeleteMapping("/homestays/{id}")
- public String deleteHomestay(@PathVariable int id) { return service.deleteHomestay(id); }
+ public String deleteHomestay(@PathVariable int id) 
+ { 
+	 return service.deleteHomestay(id);
+ }
 
- // ================= ATTRACTIONS =================
+ //ATTRACTIONS
  @GetMapping("/attractions")
- public List<Attraction> attractions() { return service.getAllAttractions(); }
+ public List<Attraction> attractions() 
+ { 
+	 return service.getAllAttractions();
+ }
 
- // ✅ OPTIONAL (VERY USEFUL FOR EDIT PAGE)
  @GetMapping("/attractions/{id}")
  public Attraction getAttractionById(@PathVariable int id) {
   return service.getAllAttractions()
@@ -114,17 +155,29 @@ public class AdminController
  }
 
  @PostMapping("/attractions")
- public String addAttraction(@RequestBody Attraction a) { return service.addAttraction(a); }
+ public String addAttraction(@RequestBody Attraction a) 
+ { 
+	 return service.addAttraction(a);
+ }
 
  @PutMapping("/attractions")
- public String updateAttraction(@RequestBody Attraction a) { return service.updateAttraction(a); }
+ public String updateAttraction(@RequestBody Attraction a) 
+ { 
+	 return service.updateAttraction(a);
+ }
 
  @DeleteMapping("/attractions/{id}")
- public String deleteAttraction(@PathVariable int id) { return service.deleteAttraction(id); }
+ public String deleteAttraction(@PathVariable int id) 
+ { 
+	 return service.deleteAttraction(id);
+ }
 
- // ================= BOOKINGS =================
+ //BOOKINGS
  @GetMapping("/bookings")
- public List<Booking> bookings() { return service.getAllBookings(); }
+ public List<Booking> bookings() 
+ { 
+	 return service.getAllBookings();
+ }
 
  @GetMapping("/bookings/status/{status}")
  public List<Booking> bookingsByStatus(@PathVariable String status) {

@@ -5,8 +5,10 @@ import com.klef.fsad.sdp.entity.*;
 
 public interface AdminService 
 {
+	
  // LOGIN
 	public Admin verifyAdminLogin(String username, String password, String pin);
+	
  // DASHBOARD
  long getTotalTourists();
  long getTotalHosts();
@@ -49,4 +51,5 @@ public interface AdminService
  List<Booking> getAllBookings();
  List<Booking> getBookingsByStatus(String status);
  List<Booking> getBookingsByPaymentStatus(String paymentStatus);
+ 
 }

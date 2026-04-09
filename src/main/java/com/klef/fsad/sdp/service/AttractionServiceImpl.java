@@ -11,45 +11,57 @@ import com.klef.fsad.sdp.repository.AttractionRepository;
 @Service
 public class AttractionServiceImpl implements AttractionService
 {
- @Autowired
- private AttractionRepository repo;
+    @Autowired
+    private AttractionRepository repo;
 
- @Override
- public String addAttraction(Attraction a) 
- {
-  repo.save(a);
-  return "Attraction Added Successfully";
- }
+    // ===================== ADD =====================
+    @Override
+    public String addAttraction(Attraction a) 
+    {
+        repo.save(a);
+        return "Attraction Added Successfully";
+    }
 
- @Override
- public List<Attraction> getAllAttractions() 
- {
-  return repo.findAll();
- }
+    // ===================== GET ALL =====================
+    @Override
+    public List<Attraction> getAllAttractions() 
+    {
+        return repo.findAll();
+    }
 
- @Override
- public Attraction getAttractionById(int id) 
- {
-  return repo.findById(id).orElse(null);
- }
+    // ===================== GET BY ID =====================
+    @Override
+    public Attraction getAttractionById(int id) 
+    {
+        return repo.findById(id).orElse(null);
+    }
 
- @Override
- public String updateAttraction(Attraction a) 
- {
-  repo.save(a);
-  return "Attraction Updated Successfully";
- }
+    // ===================== UPDATE =====================
+    @Override
+    public String updateAttraction(Attraction a) 
+    {
+        if (!repo.existsById(a.getId()))
+            return "Attraction Not Found";
 
- @Override
- public String deleteAttraction(int id) 
- {
-  repo.deleteById(id);
-  return "Attraction Deleted Successfully";
- }
+        repo.save(a);
+        return "Attraction Updated Successfully";
+    }
 
- @Override
- public List<Attraction> searchByLocation(String location) 
- {
-  return repo.findByLocation(location);
- }
+    // ===================== DELETE =====================
+    @Override
+    public String deleteAttraction(int id) 
+    {
+        if (!repo.existsById(id))
+            return "Attraction Not Found";
+
+        repo.deleteById(id);
+        return "Attraction Deleted Successfully";
+    }
+
+    // ===================== SEARCH (FILTER ✔) =====================
+    @Override
+    public List<Attraction> searchByLocation(String location) 
+    {
+        return repo.findByLocation(location);
+    }
 }

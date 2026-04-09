@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.klef.fsad.sdp.dto.ApiResponse;
 import com.klef.fsad.sdp.entity.Attraction;
 import com.klef.fsad.sdp.service.AttractionService;
 import com.klef.fsad.sdp.util.FileUploadUtil;
@@ -18,8 +19,9 @@ public class AttractionController
  @Autowired
  private AttractionService service;
 
+ // ✅ ADD ATTRACTION WITH IMAGE
  @PostMapping("/add")
- public String add(
+ public ApiResponse add(
      @RequestParam String name,
      @RequestParam String location,
      @RequestParam String description,
@@ -40,42 +42,61 @@ public class AttractionController
    a.setTimings(timings);
    a.setImagePath(imagePath);
 
-   return service.addAttraction(a);
+   String msg = service.addAttraction(a);
+
+   return new ApiResponse(msg, "SUCCESS");
+
   } 
   catch (Exception e) 
   {
-   e.printStackTrace();
-   return "Upload Failed";
+   throw new RuntimeException("Image Upload Failed");
   }
  }
- 
+
+ // ✅ GET ALL
  @GetMapping("/all")
- public List<Attraction> getAll()
+ public ApiResponse getAll()
  {
-  return service.getAllAttractions();
+  List<Attraction> list = service.getAllAttractions();
+  return new ApiResponse("Attractions Fetched", "SUCCESS", list);
  }
 
+ // ✅ GET BY ID
  @GetMapping("/{id}")
- public Attraction getById(@PathVariable int id)
+ public ApiResponse getById(@PathVariable int id)
  {
-  return service.getAttractionById(id);
+  Attraction a = service.getAttractionById(id);
+
+  if(a == null)
+  {
+   throw new RuntimeException("Attraction Not Found");
+  }
+
+  return new ApiResponse("Attraction Found", "SUCCESS", a);
  }
 
+ // ✅ UPDATE
  @PutMapping("/update")
- public String update(@RequestBody Attraction a)
+ public ApiResponse update(@RequestBody Attraction a)
  {
-  return service.updateAttraction(a);
+  String msg = service.updateAttraction(a);
+  return new ApiResponse(msg, "SUCCESS");
  }
 
+ // ✅ DELETE
  @DeleteMapping("/delete/{id}")
- public String delete(@PathVariable int id)
+ public ApiResponse delete(@PathVariable int id)
  {
-  return service.deleteAttraction(id);
+  String msg = service.deleteAttraction(id);
+  return new ApiResponse(msg, "SUCCESS");
  }
 
+ // ✅ SEARCH BY LOCATION (FILTER)
  @GetMapping("/search/{location}")
- public List<Attraction> search(@PathVariable String location)
+ public ApiResponse search(@PathVariable String location)
  {
-  return service.searchByLocation(location);
+  List<Attraction> list = service.searchByLocation(location);
+
+  return new ApiResponse("Search Results", "SUCCESS", list);
  }
 }

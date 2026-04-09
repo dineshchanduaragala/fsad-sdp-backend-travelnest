@@ -12,16 +12,25 @@ public class FileUploadUtil
 
     public static String saveFile(MultipartFile file, String folder) throws IOException 
     {
-        // ✅ Create folder if not exists
+        if (file == null || file.isEmpty()) 
+        {
+            throw new IOException("File is empty");
+        }
+
+        // ✅ Create folder
         String uploadDir = BASE_DIR + folder + "/";
         File dir = new File(uploadDir);
 
-        if (!dir.exists()) {
-            dir.mkdirs();   // 🔥 IMPORTANT FIX
+        if (!dir.exists()) 
+        {
+            dir.mkdirs();
         }
 
-        // ✅ Generate unique file name
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        // ✅ Clean filename
+        String originalName = file.getOriginalFilename();
+        String safeName = originalName.replaceAll("\\s+", "_");
+
+        String fileName = UUID.randomUUID() + "_" + safeName;
 
         // ✅ Save file
         File destination = new File(uploadDir + fileName);

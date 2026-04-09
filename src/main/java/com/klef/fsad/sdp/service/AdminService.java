@@ -1,55 +1,56 @@
 package com.klef.fsad.sdp.service;
 
 import java.util.List;
+
 import com.klef.fsad.sdp.entity.*;
 
 public interface AdminService 
 {
-	
- // LOGIN
-	public Admin verifyAdminLogin(String username, String password, String pin);
-	
- // DASHBOARD
- long getTotalTourists();
- long getTotalHosts();
- long getTotalGuides();
- long getTotalHomestays();
- long getTotalAttractions();
- long getTotalBookings();
+    // ===================== AUTH =====================
+    Admin verifyAdminLogin(String username, String password, String pin);
 
- // TOURISTS
- List<Tourist> viewAllTourists();
+    // ===================== DASHBOARD =====================
+    long getTotalTourists();
+    long getTotalHosts();
+    long getTotalGuides();
+    long getTotalHomestays();
+    long getTotalAttractions();
+    long getTotalBookings();
+    
+    List<Tourist> getAllTourists();
 
- // HOSTS
- List<Host> getPendingHosts();
- List<Host> getAllHosts();
- String approveHost(int id);
- String rejectHost(int id);
+    // ===================== TOURISTS =====================
+    List<Tourist> viewAllTourists();
 
- // GUIDES
- List<Guide> getPendingGuides();
- List<Guide> getAllGuides();
- String approveGuide(int id);
- String rejectGuide(int id);
+    // ===================== HOST MANAGEMENT =====================
+    List<Host> getAllHosts();
+    List<Host> getPendingHosts();
+    String approveHost(int id);
+    String rejectHost(int id);
 
- // HOMESTAYS
- List<Homestay> getPendingHomestays();
- List<Homestay> getAllHomestays();
- String approveHomestay(int id);
- String rejectHomestay(int id);
- String deleteHomestay(int id);
- String updateHomestay(Homestay h);
- String addHomestay(Homestay h);
+    // ===================== GUIDE MANAGEMENT =====================
+    List<Guide> getAllGuides();
+    List<Guide> getPendingGuides();
+    String approveGuide(int id);
+    String rejectGuide(int id);
 
- // ATTRACTIONS
- List<Attraction> getAllAttractions();
- String addAttraction(Attraction a);
- String updateAttraction(Attraction a);
- String deleteAttraction(int id);
+    // ===================== HOMESTAY MANAGEMENT =====================
+    List<Homestay> getAllHomestays();
+    List<Homestay> getPendingHomestays();
+    String addHomestay(Homestay h);        // Admin adds → auto approve
+    String updateHomestay(Homestay h);
+    String deleteHomestay(int id);
+    String approveHomestay(int id);
+    String rejectHomestay(int id);
 
- // BOOKINGS
- List<Booking> getAllBookings();
- List<Booking> getBookingsByStatus(String status);
- List<Booking> getBookingsByPaymentStatus(String paymentStatus);
- 
+    // ===================== ATTRACTION MANAGEMENT =====================
+    List<Attraction> getAllAttractions();
+    String addAttraction(Attraction a);
+    String updateAttraction(Attraction a);
+    String deleteAttraction(int id);
+
+    // ===================== BOOKING MANAGEMENT =====================
+    List<Booking> getAllBookings();
+    List<Booking> getBookingsByStatus(String status);
+    List<Booking> getBookingsByPaymentStatus(String paymentStatus);
 }

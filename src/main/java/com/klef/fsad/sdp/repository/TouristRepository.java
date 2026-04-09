@@ -7,5 +7,7 @@ import com.klef.fsad.sdp.entity.Tourist;
 @Repository
 public interface TouristRepository extends JpaRepository<Tourist,Integer>
 {
- Tourist findByEmailAndPassword(String email,String password);
+    Tourist findByEmailAndPassword(String email,String password);
+
+    Tourist findByEmail(String email);   // ✅ REQUIRED
 }

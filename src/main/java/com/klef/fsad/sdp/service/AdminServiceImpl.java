@@ -11,184 +11,223 @@ import com.klef.fsad.sdp.repository.*;
 @Service
 public class AdminServiceImpl implements AdminService
 {
- @Autowired 
- private AdminRepository adminRepo;
- @Autowired 
- private TouristRepository touristRepo;
- @Autowired 
- private HostRepository hostRepo;
- @Autowired 
- private GuideRepository guideRepo;
- @Autowired 
- private HomestayRepository homestayRepo;
- @Autowired 
- private AttractionRepository attractionRepo;
- @Autowired 
- private BookingRepository bookingRepo;
+    @Autowired 
+    private AdminRepository adminRepo;
+    @Autowired 
+    private TouristRepository touristRepo;
+    @Autowired 
+    private HostRepository hostRepo;
+    @Autowired 
+    private GuideRepository guideRepo;
+    @Autowired 
+    private HomestayRepository homestayRepo;
+    @Autowired 
+    private AttractionRepository attractionRepo;
+    @Autowired 
+    private BookingRepository bookingRepo;
 
- // LOGIN
- @Override
- public Admin verifyAdminLogin(String username, String password, String pin) {
+    // ===================== LOGIN =====================
+    @Override
+    public Admin verifyAdminLogin(String username, String password, String pin) 
+    {
+        Admin admin = adminRepo.findByUsernameAndPasswordAndPin(username, password, pin);
 
-     Admin admin = adminRepo.findByUsernameAndPasswordAndPin(username, password, pin);
+        if (admin != null && admin.getPin().equals(pin)) 
+            return admin;
 
-     if (admin != null && admin.getPin().equals(pin)) {
-         return admin;
-     }
-     return null;
- }
+        return null;
+    }
 
- // DASHBOARD
- public long getTotalTourists() 
- { 
-	 return touristRepo.count();
- }
- 
- public long getTotalHosts() 
- { 
-	 return hostRepo.count();
- }
- 
- public long getTotalGuides() 
- { 
-	 return guideRepo.count();
- }
- 
- public long getTotalHomestays() 
- { 
-	 return homestayRepo.count();
- }
- 
- public long getTotalAttractions() 
- { 
-	 return attractionRepo.count();
- }
- 
- public long getTotalBookings() 
- { 
-	 return bookingRepo.count();
- }
+    // ===================== DASHBOARD =====================
+    public long getTotalTourists() { return touristRepo.count(); }
+    public long getTotalHosts() { return hostRepo.count(); }
+    public long getTotalGuides() { return guideRepo.count(); }
+    public long getTotalHomestays() { return homestayRepo.count(); }
+    public long getTotalAttractions() { return attractionRepo.count(); }
+    public long getTotalBookings() { return bookingRepo.count(); }
 
- // TOURISTS
- public List<Tourist> viewAllTourists() 
- { 
-	 return touristRepo.findAll();
- }
+    // ===================== TOURISTS =====================
+    public List<Tourist> viewAllTourists() 
+    { 
+        return touristRepo.findAll();
+    }
 
- // HOSTS
- public List<Host> getPendingHosts() 
- { 
-	 return hostRepo.findByApproved(false);
- }
- 
- public List<Host> getAllHosts() 
- { 
-	 return hostRepo.findAll();
- }
+    // ===================== HOSTS =====================
+    public List<Host> getAllHosts() 
+    { 
+        return hostRepo.findAll();
+    }
 
- public String approveHost(int id) {
-  Host h = hostRepo.findById(id).orElse(null);
-  if(h!=null){ h.setApproved(true); hostRepo.save(h); return "Host Approved"; }
-  return "Host Not Found";
- }
+    public List<Host> getPendingHosts() 
+    { 
+        return hostRepo.findByApproved(false);
+    }
 
- public String rejectHost(int id) {
-  hostRepo.deleteById(id);
-  return "Host Rejected";
- }
+    public String approveHost(int id) 
+    {
+        Host h = hostRepo.findById(id).orElse(null);
 
- // GUIDES
- public List<Guide> getPendingGuides() 
- { 
-	 return guideRepo.findByApproved(false);
- }
- 
- public List<Guide> getAllGuides() 
- { 
-	 return guideRepo.findAll();
- }
+        if (h == null) return "Host Not Found";
 
- public String approveGuide(int id) {
-  Guide g = guideRepo.findById(id).orElse(null);
-  if(g!=null){ g.setApproved(true); guideRepo.save(g); return "Guide Approved"; }
-  return "Guide Not Found";
- }
+        h.setApproved(true);
+        hostRepo.save(h);
+        return "Host Approved Successfully";
+    }
 
- public String rejectGuide(int id) {
-  guideRepo.deleteById(id);
-  return "Guide Rejected";
- }
+    public String rejectHost(int id) 
+    {
+        if (!hostRepo.existsById(id)) return "Host Not Found";
 
- // HOMESTAYS
- public List<Homestay> getPendingHomestays() 
- { 
-	 return homestayRepo.findByApproved(false);
- }
- 
- public List<Homestay> getAllHomestays() 
- { 
-	 return homestayRepo.findAll();
- }
+        hostRepo.deleteById(id);
+        return "Host Rejected & Deleted";
+    }
 
- public String approveHomestay(int id){
-  Homestay h = homestayRepo.findById(id).orElse(null);
-  if(h!=null){ h.setApproved(true); homestayRepo.save(h); return "Approved"; }
-  return "Not Found";
- }
+    // ===================== GUIDES =====================
+    public List<Guide> getAllGuides() 
+    { 
+        return guideRepo.findAll();
+    }
 
- public String rejectHomestay(int id) {
-  homestayRepo.deleteById(id);
-  return "Rejected";
- }
+    public List<Guide> getPendingGuides() 
+    { 
+        return guideRepo.findByApproved(false);
+    }
 
- public String deleteHomestay(int id) {
-  homestayRepo.deleteById(id);
-  return "Deleted";
- }
+    public String approveGuide(int id) 
+    {
+        Guide g = guideRepo.findById(id).orElse(null);
 
- public String updateHomestay(Homestay h) {
-     homestayRepo.save(h);
-     return "Updated";
- }
- public String addHomestay(Homestay h) {
-	    h.setApproved(true);
-	    homestayRepo.save(h);
-	    return "Added";
-	}
- 
+        if (g == null) return "Guide Not Found";
 
- // ATTRACTIONS
- public List<Attraction> getAllAttractions() 
- { 
-	 return attractionRepo.findAll();
- }
+        g.setApproved(true);
+        guideRepo.save(g);
+        return "Guide Approved Successfully";
+    }
 
- public String addAttraction(Attraction a) {
-  attractionRepo.save(a);
-  return "Added";
- }
+    public String rejectGuide(int id) 
+    {
+        if (!guideRepo.existsById(id)) return "Guide Not Found";
 
- public String updateAttraction(Attraction a) {
-  attractionRepo.save(a);
-  return "Updated";
- }
+        guideRepo.deleteById(id);
+        return "Guide Rejected & Deleted";
+    }
 
- public String deleteAttraction(int id) {
-  attractionRepo.deleteById(id);
-  return "Deleted";
- }
+    // ===================== HOMESTAYS =====================
+    public List<Homestay> getAllHomestays() 
+    { 
+        return homestayRepo.findAll();
+    }
 
- // BOOKINGS
- public List<Booking> getAllBookings() 
- { 
-	 return bookingRepo.findAll();
- }
+    public List<Homestay> getPendingHomestays() 
+    { 
+        return homestayRepo.findByApproved(false);
+    }
 
- public List<Booking> getBookingsByStatus(String status) {
-	 return bookingRepo.findByBookingStatus(status);
- }
+    public String approveHomestay(int id)
+    {
+        Homestay h = homestayRepo.findById(id).orElse(null);
 
- public List<Booking> getBookingsByPaymentStatus(String paymentStatus) {
-  return bookingRepo.findByPaymentStatus(paymentStatus);
- }
+        if (h == null) return "Homestay Not Found";
+
+        h.setApproved(true);
+        homestayRepo.save(h);
+        return "Homestay Approved Successfully";
+    }
+
+    public String rejectHomestay(int id) 
+    {
+        if (!homestayRepo.existsById(id)) return "Homestay Not Found";
+
+        homestayRepo.deleteById(id);
+        return "Homestay Rejected & Deleted";
+    }
+
+    public String deleteHomestay(int id) 
+    {
+        try 
+        {
+            if (!homestayRepo.existsById(id))
+                return "Homestay Not Found";
+
+            homestayRepo.deleteById(id);
+            return "Homestay Deleted Successfully";
+        } 
+        catch (Exception e) 
+        {
+            return "Cannot Delete: Linked with Bookings";
+        }
+    }
+
+    public String updateHomestay(Homestay h) 
+    {
+        if (!homestayRepo.existsById(h.getId()))
+            return "Homestay Not Found";
+
+        homestayRepo.save(h);
+        return "Homestay Updated Successfully";
+    }
+
+    public String addHomestay(Homestay h) 
+    {
+        h.setApproved(true);  // ✅ Admin adds → auto approved
+        h.setAvailable(true);
+
+        homestayRepo.save(h);
+        return "Homestay Added Successfully";
+    }
+
+    // ===================== ATTRACTIONS =====================
+    public List<Attraction> getAllAttractions() 
+    { 
+        return attractionRepo.findAll();
+    }
+
+    public String addAttraction(Attraction a) 
+    {
+        attractionRepo.save(a);
+        return "Attraction Added Successfully";
+    }
+
+    public String updateAttraction(Attraction a) 
+    {
+        if (!attractionRepo.existsById(a.getId()))
+            return "Attraction Not Found";
+
+        attractionRepo.save(a);
+        return "Attraction Updated Successfully";
+    }
+    @Autowired
+    private TouristRepository touristRepository;
+
+    // ================= TOURISTS =================
+    @Override
+    public List<Tourist> getAllTourists()
+    {
+        return touristRepository.findAll();
+    }
+
+    public String deleteAttraction(int id) 
+    {
+        if (!attractionRepo.existsById(id))
+            return "Attraction Not Found";
+
+        attractionRepo.deleteById(id);
+        return "Attraction Deleted Successfully";
+    }
+
+    // ===================== BOOKINGS =====================
+    public List<Booking> getAllBookings() 
+    { 
+        return bookingRepo.findAll();
+    }
+
+    public List<Booking> getBookingsByStatus(String status) 
+    {
+        return bookingRepo.findByBookingStatus(status);
+    }
+
+    public List<Booking> getBookingsByPaymentStatus(String paymentStatus) 
+    {
+        return bookingRepo.findByPaymentStatus(paymentStatus);
+    }
 }

@@ -8,7 +8,9 @@ import com.klef.fsad.sdp.entity.Guide;
 @Repository
 public interface GuideRepository extends JpaRepository<Guide,Integer>
 {
-	Guide findByEmailAndPasswordAndApproved(String email, String password, boolean approved);
+    Guide findByEmailAndPasswordAndApproved(String email, String password, boolean approved);
 
- List<Guide> findByApproved(boolean status);
+    Guide findByEmail(String email);   // ✅ REQUIRED
+
+    List<Guide> findByApproved(boolean status);
 }

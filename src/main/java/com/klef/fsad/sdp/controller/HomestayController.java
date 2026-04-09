@@ -3,9 +3,11 @@ package com.klef.fsad.sdp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;   // ✅ IMPORTANT
+import org.springframework.web.multipart.MultipartFile;
 
+import com.klef.fsad.sdp.dto.ApiResponse;
 import com.klef.fsad.sdp.entity.Homestay;
 import com.klef.fsad.sdp.service.HomestayService;
 import com.klef.fsad.sdp.util.FileUploadUtil;
@@ -18,8 +20,9 @@ public class HomestayController
     @Autowired
     private HomestayService service;
 
+    // ===================== HOST ADD =====================
     @PostMapping("/add")
-    public String add(
+    public ResponseEntity<ApiResponse> add(
         @RequestParam String name,
         @RequestParam String location,
         @RequestParam String description,
@@ -29,10 +32,15 @@ public class HomestayController
         @RequestParam(required = false) MultipartFile image,
         @RequestParam(required = false) MultipartFile qr
     ) {
-        try {
+        try 
+        {
+            String imagePath = (image != null) 
+                    ? FileUploadUtil.saveFile(image, "homestays") 
+                    : null;
 
-            String imagePath = (image != null) ? FileUploadUtil.saveFile(image, "homestays") : null;
-            String qrPath = (qr != null) ? FileUploadUtil.saveFile(qr, "qr") : null;
+            String qrPath = (qr != null) 
+                    ? FileUploadUtil.saveFile(qr, "qr") 
+                    : null;
 
             Homestay h = new Homestay();
             h.setName(name);
@@ -44,80 +52,108 @@ public class HomestayController
             h.setImagePath(imagePath);
             h.setQrPath(qrPath);
 
-            return service.addHomestay(h);
+            String msg = service.addHomestay(h);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Upload Failed";
+            return ResponseEntity.ok(
+                new ApiResponse(msg, "SUCCESS")
+            );
+        } 
+        catch (Exception e) 
+        {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse("Upload Failed", "FAIL"));
         }
     }
+
+    // ===================== ADMIN ADD (AUTO APPROVE) =====================
     @PostMapping("/admin/add")
-    public String addByAdmin(@RequestBody Homestay h)
+    public ResponseEntity<ApiResponse> addByAdmin(@RequestBody Homestay h)
     {
-        h.setApproved(true);  // ✅ Direct approval
-        return service.addHomestay(h);
+        h.setApproved(true);  // ✅ direct approval
+
+        String msg = service.addHomestay(h);
+
+        return ResponseEntity.ok(
+            new ApiResponse(msg, "SUCCESS")
+        );
     }
 
-    // ✅ VIEW ALL (Admin)
+    // ===================== VIEW ALL =====================
     @GetMapping("/all")
-    public List<Homestay> getAll()
+    public ResponseEntity<List<Homestay>> getAll()
     {
-        return service.getAllHomestays();
+        return ResponseEntity.ok(service.getAllHomestays());
     }
 
-    // ✅ VIEW APPROVED (Tourist)
+    // ===================== VIEW APPROVED =====================
     @GetMapping("/approved")
-    public List<Homestay> getApproved()
+    public ResponseEntity<List<Homestay>> getApproved()
     {
-        return service.getApprovedHomestays();
+        return ResponseEntity.ok(service.getApprovedHomestays());
     }
 
-    // ✅ VIEW BY ID
+    // ===================== VIEW BY ID =====================
     @GetMapping("/{id}")
-    public Homestay getById(@PathVariable int id)
+    public ResponseEntity<Homestay> getById(@PathVariable int id)
     {
-        return service.getById(id);
+        return ResponseEntity.ok(service.getById(id));
     }
 
-    // ⚠️ UPDATE (No image update here – keep simple)
+    // ===================== UPDATE =====================
     @PutMapping("/update")
-    public String update(@RequestBody Homestay h)
+    public ResponseEntity<ApiResponse> update(@RequestBody Homestay h)
     {
-        return service.updateHomestay(h);
+        String msg = service.updateHomestay(h);
+
+        return ResponseEntity.ok(
+            new ApiResponse(msg, "SUCCESS")
+        );
     }
 
-    // ✅ DELETE
+    // ===================== DELETE =====================
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable int id)
+    public ResponseEntity<ApiResponse> delete(@PathVariable int id)
     {
-        return service.deleteHomestay(id);
+        String msg = service.deleteHomestay(id);
+
+        return ResponseEntity.ok(
+            new ApiResponse(msg, "SUCCESS")
+        );
     }
 
-    // ✅ APPROVE (Admin)
+    // ===================== APPROVE =====================
     @PutMapping("/approve/{id}")
-    public String approve(@PathVariable int id)
+    public ResponseEntity<ApiResponse> approve(@PathVariable int id)
     {
-        return service.approveHomestay(id);
+        String msg = service.approveHomestay(id);
+
+        return ResponseEntity.ok(
+            new ApiResponse(msg, "SUCCESS")
+        );
     }
 
-    // ✅ REJECT (Admin)
+    // ===================== REJECT =====================
     @DeleteMapping("/reject/{id}")
-    public String reject(@PathVariable int id)
+    public ResponseEntity<ApiResponse> reject(@PathVariable int id)
     {
-        return service.rejectHomestay(id);
+        String msg = service.rejectHomestay(id);
+
+        return ResponseEntity.ok(
+            new ApiResponse(msg, "SUCCESS")
+        );
     }
 
-    // ✅ SEARCH (Tourist)
+    // ===================== SEARCH (FILTER ✔) =====================
     @GetMapping("/search/{location}")
-    public List<Homestay> search(@PathVariable String location)
+    public ResponseEntity<List<Homestay>> search(@PathVariable String location)
     {
-        return service.searchByLocation(location);
+        return ResponseEntity.ok(service.searchByLocation(location));
     }
 
-    // ✅ HOST HOMESTAYS
+    // ===================== HOST HOMESTAYS =====================
     @GetMapping("/host/{hostId}")
-    public List<Homestay> getHostHomestays(@PathVariable int hostId)
+    public ResponseEntity<List<Homestay>> getHostHomestays(@PathVariable int hostId)
     {
-        return service.getHostHomestays(hostId);
+        return ResponseEntity.ok(service.getHostHomestays(hostId));
     }
 }

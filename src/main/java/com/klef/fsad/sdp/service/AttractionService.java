@@ -1,19 +1,20 @@
 package com.klef.fsad.sdp.service;
 
 import java.util.List;
+
 import com.klef.fsad.sdp.entity.Attraction;
 
 public interface AttractionService 
 {
- String addAttraction(Attraction a);
+    String addAttraction(Attraction a);
 
- List<Attraction> getAllAttractions();
+    List<Attraction> getAllAttractions();
 
- Attraction getAttractionById(int id);
+    Attraction getAttractionById(int id);
 
- String updateAttraction(Attraction a);
+    String updateAttraction(Attraction a);
 
- String deleteAttraction(int id);
+    String deleteAttraction(int id);
 
- List<Attraction> searchByLocation(String location);
+    List<Attraction> searchByLocation(String location);
 }

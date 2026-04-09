@@ -8,8 +8,9 @@ import com.klef.fsad.sdp.entity.Host;
 @Repository
 public interface HostRepository extends JpaRepository<Host,Integer>
 {
-    // ✅ FIXED (only approved hosts can login)
     Host findByEmailAndPasswordAndApproved(String email,String password, boolean approved);
+
+    Host findByEmail(String email);   // ✅ REQUIRED
 
     List<Host> findByApproved(boolean status);
 }

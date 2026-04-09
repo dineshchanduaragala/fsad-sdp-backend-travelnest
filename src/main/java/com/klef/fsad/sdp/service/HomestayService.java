@@ -5,24 +5,24 @@ import com.klef.fsad.sdp.entity.Homestay;
 
 public interface HomestayService 
 {
- String addHomestay(Homestay h);
- String addHomestayByAdmin(Homestay h);
+    String addHomestay(Homestay h);           // HOST
+    String addHomestayByAdmin(Homestay h);    // ADMIN
 
- List<Homestay> getAllHomestays();
+    List<Homestay> getAllHomestays();
 
- List<Homestay> getApprovedHomestays();
+    List<Homestay> getApprovedHomestays();
 
- Homestay getById(int id);
+    Homestay getById(int id);
 
- String updateHomestay(Homestay h);
+    String updateHomestay(Homestay h);
 
- String deleteHomestay(int id);
+    String deleteHomestay(int id);
 
- String approveHomestay(int id);
+    String approveHomestay(int id);
 
- String rejectHomestay(int id);
+    String rejectHomestay(int id);
 
- List<Homestay> searchByLocation(String location);
+    List<Homestay> searchByLocation(String location);
 
- List<Homestay> getHostHomestays(int hostId);
+    List<Homestay> getHostHomestays(int hostId);
 }

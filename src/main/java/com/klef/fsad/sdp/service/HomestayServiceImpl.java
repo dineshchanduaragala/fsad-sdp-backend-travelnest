@@ -11,97 +11,152 @@ import com.klef.fsad.sdp.repository.HomestayRepository;
 @Service
 public class HomestayServiceImpl implements HomestayService
 {
- @Autowired
- private HomestayRepository repo;
+    @Autowired
+    private HomestayRepository repo;
 
- @Override
-//HOST
- public String addHomestay(Homestay h) 
- {
-     if (!h.isApproved()) {   // ✅ Only set false if not already true
-         h.setApproved(false);
-     }
+    // ===================== HOST ADD =====================
+    @Override
+    public String addHomestay(Homestay h) 
+    {
+        if (h.getName() == null || h.getName().isEmpty())
+            return "Homestay name required";
 
-     h.setAvailable(true);
+        if (h.getLocation() == null || h.getLocation().isEmpty())
+            return "Location required";
 
-     repo.save(h);
-     return "Homestay Added";
- }
+        if (h.getPrice() <= 0)
+            return "Invalid price";
 
-//ADMIN
-public String addHomestayByAdmin(Homestay h) {
-  h.setApproved(true);
-  repo.save(h);
-  return "Added by admin";
-}
+        if (h.getHostId() <= 0)
+            return "Invalid Host";
 
- @Override
- public List<Homestay> getAllHomestays() 
- {
-  return repo.findAll();
- }
+        // ❌ HOST cannot approve
+        h.setApproved(false);
+        h.setAvailable(true);
 
- @Override
- public List<Homestay> getApprovedHomestays() 
- {
-  return repo.findByApproved(true);
- }
+        repo.save(h);
+        return "Homestay Added Successfully (Waiting for Approval)";
+    }
 
- @Override
- public Homestay getById(int id) 
- {
-  return repo.findById(id).orElse(null);
- }
+    // ===================== ADMIN ADD =====================
+    @Override
+    public String addHomestayByAdmin(Homestay h) 
+    {
+        if (h.getName() == null || h.getName().isEmpty())
+            return "Homestay name required";
 
- @Override
- public String updateHomestay(Homestay h) 
- {
-  repo.save(h);
-  return "Homestay Updated Successfully";
- }
+        if (h.getLocation() == null || h.getLocation().isEmpty())
+            return "Location required";
 
- @Override
- public String deleteHomestay(int id) 
- {
-     try {
-         repo.deleteById(id);
-         return "Deleted";
-     } catch (Exception e) {
-         return "Cannot delete: Homestay has bookings";
-     }
- }
+        if (h.getPrice() <= 0)
+            return "Invalid price";
 
- @Override
- public String approveHomestay(int id) 
- {
-  Homestay h = repo.findById(id).orElse(null);
+        h.setApproved(true);   // ✅ Direct approval
+        h.setAvailable(true);
 
-  if(h!=null)
-  {
-   h.setApproved(true);
-   repo.save(h);
-   return "Homestay Approved";
-  }
+        repo.save(h);
+        return "Homestay Added & Approved Successfully";
+    }
 
-  return "Homestay Not Found";
- }
+    // ===================== GET =====================
+    @Override
+    public List<Homestay> getAllHomestays() 
+    {
+        return repo.findAll();
+    }
 
- @Override
- public String rejectHomestay(int id) 
- {
-  repo.deleteById(id);
-  return "Homestay Rejected & Deleted";
- }
+    @Override
+    public List<Homestay> getApprovedHomestays() 
+    {
+        return repo.findByApproved(true);
+    }
 
- @Override
- public List<Homestay> searchByLocation(String location) 
- {
-  return repo.findByLocation(location);
- }
+    @Override
+    public Homestay getById(int id) 
+    {
+        return repo.findById(id).orElse(null);
+    }
 
- @Override
- public List<Homestay> getHostHomestays(int hostId) 
- {
-  return repo.findByHostId(hostId);
- }
+    // ===================== UPDATE =====================
+    @Override
+    public String updateHomestay(Homestay h) 
+    {
+        if (h.getId() == 0)
+            return "Invalid Homestay ID";
+
+        Homestay existing = repo.findById(h.getId()).orElse(null);
+
+        if (existing == null)
+            return "Homestay Not Found";
+
+        // ✅ Keep approval unchanged
+        h.setApproved(existing.isApproved());
+        h.setHostId(existing.getHostId());
+
+        repo.save(h);
+        return "Homestay Updated Successfully";
+    }
+
+    // ===================== DELETE =====================
+    @Override
+    public String deleteHomestay(int id) 
+    {
+        Homestay h = repo.findById(id).orElse(null);
+
+        if (h == null)
+            return "Homestay Not Found";
+
+        try {
+            repo.deleteById(id);
+            return "Homestay Deleted Successfully";
+        } 
+        catch (Exception e) {
+            return "Cannot delete: Active bookings exist";
+        }
+    }
+
+    // ===================== APPROVE =====================
+    @Override
+    public String approveHomestay(int id) 
+    {
+        Homestay h = repo.findById(id).orElse(null);
+
+        if (h == null)
+            return "Homestay Not Found";
+
+        if (h.isApproved())
+            return "Already Approved";
+
+        h.setApproved(true);
+        repo.save(h);
+
+        return "Homestay Approved Successfully";
+    }
+
+    // ===================== REJECT =====================
+    @Override
+    public String rejectHomestay(int id) 
+    {
+        Homestay h = repo.findById(id).orElse(null);
+
+        if (h == null)
+            return "Homestay Not Found";
+
+        repo.deleteById(id);
+        return "Homestay Rejected & Deleted";
+    }
+
+    // ===================== SEARCH =====================
+    @Override
+    public List<Homestay> searchByLocation(String location) 
+    {
+        return repo.findByLocation(location);
+    }
+
+    // ===================== HOST =====================
+    @Override
+    public List<Homestay> getHostHomestays(int hostId) 
+    {
+        return repo.findByHostId(hostId);
+    }
 }

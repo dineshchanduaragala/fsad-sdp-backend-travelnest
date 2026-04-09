@@ -2,190 +2,190 @@ package com.klef.fsad.sdp.controller;
 
 import java.util.List;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.klef.fsad.sdp.dto.*;
 import com.klef.fsad.sdp.entity.*;
+import com.klef.fsad.sdp.security.JwtUtil;
 import com.klef.fsad.sdp.service.AdminService;
 
 @RestController
 @RequestMapping("adminapi")
 @CrossOrigin("*")
-public class AdminController 
+public class AdminController
 {
  @Autowired
  private AdminService service;
 
- //LOGIN
+ @Autowired
+ private JwtUtil jwtUtil;
+
+ // LOGIN
  @PostMapping("/login")
- public ResponseEntity<?> login(@RequestBody Admin admin) {
+ public ResponseEntity<?> login(@RequestBody LoginRequest req)
+ {
+  Admin user = service.verifyAdminLogin(
+      req.getEmail(),
+      req.getPassword(),
+      req.getPin()
+  );
 
-     Admin user = service.verifyAdminLogin(
-         admin.getUsername(),
-         admin.getPassword(),
-         admin.getPin()
-     );
+  String token = jwtUtil.generateToken(user.getUsername(), "ADMIN");
 
-     if(user != null) {
-         return ResponseEntity.ok(user);
-     } else {
-         return ResponseEntity.status(401).body("Invalid Credentials or PIN");
-     }
+  return ResponseEntity.ok(new AuthResponse(token, "ADMIN", user));
  }
 
  // DASHBOARD
  @GetMapping("/dashboard")
- public Object dashboard() {
-  return new Object() {
-   public long tourists = service.getTotalTourists();
-   public long hosts = service.getTotalHosts();
-   public long guides = service.getTotalGuides();
-   public long homestays = service.getTotalHomestays();
-   public long attractions = service.getTotalAttractions();
-   public long bookings = service.getTotalBookings();
-  };
+ public ApiResponse dashboard()
+ {
+  return new ApiResponse("Dashboard Data", "SUCCESS", Map.of(
+      "tourists", service.getTotalTourists(),
+      "hosts", service.getTotalHosts(),
+      "guides", service.getTotalGuides(),
+      "homestays", service.getTotalHomestays(),
+      "attractions", service.getTotalAttractions(),
+      "bookings", service.getTotalBookings()
+  ));
  }
+ 
+//================= TOURISTS =================
+@GetMapping("/tourists")
+public ApiResponse getAllTourists()
+{
+  return new ApiResponse(
+      "Tourists List",
+      "SUCCESS",
+      service.getAllTourists()
+  );
+}
 
  // HOSTS
  @GetMapping("/hosts")
- public List<Host> allHosts() 
- { 
-	 return service.getAllHosts();
+ public ApiResponse allHosts()
+ {
+  return new ApiResponse("Hosts List", "SUCCESS", service.getAllHosts());
  }
 
  @GetMapping("/hosts/pending")
- public List<Host> pendingHosts() 
- { 
-	 return service.getPendingHosts();
+ public ApiResponse pendingHosts()
+ {
+  return new ApiResponse("Pending Hosts", "SUCCESS", service.getPendingHosts());
  }
 
  @PostMapping("/hosts/approve/{id}")
- public String approveHost(@PathVariable int id) 
- { 
-	 return service.approveHost(id);
+ public ApiResponse approveHost(@PathVariable int id)
+ {
+  return new ApiResponse(service.approveHost(id), "SUCCESS");
  }
 
  @PostMapping("/hosts/reject/{id}")
- public String rejectHost(@PathVariable int id) 
- { 
-	 return service.rejectHost(id);
+ public ApiResponse rejectHost(@PathVariable int id)
+ {
+  return new ApiResponse(service.rejectHost(id), "SUCCESS");
  }
 
  // GUIDES
  @GetMapping("/guides")
- public List<Guide> allGuides() 
- { 
-	 return service.getAllGuides();
+ public ApiResponse allGuides()
+ {
+  return new ApiResponse("Guides List", "SUCCESS", service.getAllGuides());
  }
 
  @GetMapping("/guides/pending")
- public List<Guide> pendingGuides() 
- { 
-	 return service.getPendingGuides();
+ public ApiResponse pendingGuides()
+ {
+  return new ApiResponse("Pending Guides", "SUCCESS", service.getPendingGuides());
  }
 
  @PostMapping("/guides/approve/{id}")
- public String approveGuide(@PathVariable int id) 
- { 
-	 return service.approveGuide(id);
+ public ApiResponse approveGuide(@PathVariable int id)
+ {
+  return new ApiResponse(service.approveGuide(id), "SUCCESS");
  }
 
  @PostMapping("/guides/reject/{id}")
- public String rejectGuide(@PathVariable int id) 
- { 
-	 return service.rejectGuide(id);
+ public ApiResponse rejectGuide(@PathVariable int id)
+ {
+  return new ApiResponse(service.rejectGuide(id), "SUCCESS");
  }
 
  // HOMESTAYS
  @GetMapping("/homestays")
- public List<Homestay> allHomestays() 
- { 
-	 return service.getAllHomestays();
+ public ApiResponse allHomestays()
+ {
+  return new ApiResponse("Homestays", "SUCCESS", service.getAllHomestays());
  }
 
  @GetMapping("/homestays/pending")
- public List<Homestay> pendingHomestays() 
- { 
-	 return service.getPendingHomestays();
+ public ApiResponse pendingHomestays()
+ {
+  return new ApiResponse("Pending Homestays", "SUCCESS", service.getPendingHomestays());
  }
 
  @PostMapping("/homestays")
- public String addHomestay(@RequestBody Homestay h) {
-  return service.addHomestay(h);
+ public ApiResponse addHomestay(@RequestBody Homestay h)
+ {
+  return new ApiResponse(service.addHomestay(h), "SUCCESS");
  }
- 
+
  @PutMapping("/homestays")
- public String updateHomestay(@RequestBody Homestay h) {
-     return service.updateHomestay(h);
+ public ApiResponse updateHomestay(@RequestBody Homestay h)
+ {
+  return new ApiResponse(service.updateHomestay(h), "SUCCESS");
  }
 
  @PostMapping("/homestays/approve/{id}")
- public String approveHomestay(@PathVariable int id) 
- { 
-	 return service.approveHomestay(id);
+ public ApiResponse approveHomestay(@PathVariable int id)
+ {
+  return new ApiResponse(service.approveHomestay(id), "SUCCESS");
  }
 
  @PostMapping("/homestays/reject/{id}")
- public String rejectHomestay(@PathVariable int id) 
- { 
-	 return service.rejectHomestay(id);
+ public ApiResponse rejectHomestay(@PathVariable int id)
+ {
+  return new ApiResponse(service.rejectHomestay(id), "SUCCESS");
  }
 
  @DeleteMapping("/homestays/{id}")
- public String deleteHomestay(@PathVariable int id) 
- { 
-	 return service.deleteHomestay(id);
+ public ApiResponse deleteHomestay(@PathVariable int id)
+ {
+  return new ApiResponse(service.deleteHomestay(id), "SUCCESS");
  }
 
- //ATTRACTIONS
+ // ATTRACTIONS
  @GetMapping("/attractions")
- public List<Attraction> attractions() 
- { 
-	 return service.getAllAttractions();
- }
-
- @GetMapping("/attractions/{id}")
- public Attraction getAttractionById(@PathVariable int id) {
-  return service.getAllAttractions()
-         .stream()
-         .filter(a -> a.getId() == id)
-         .findFirst()
-         .orElse(null);
+ public ApiResponse attractions()
+ {
+  return new ApiResponse("Attractions", "SUCCESS", service.getAllAttractions());
  }
 
  @PostMapping("/attractions")
- public String addAttraction(@RequestBody Attraction a) 
- { 
-	 return service.addAttraction(a);
+ public ApiResponse addAttraction(@RequestBody Attraction a)
+ {
+  return new ApiResponse(service.addAttraction(a), "SUCCESS");
  }
 
  @PutMapping("/attractions")
- public String updateAttraction(@RequestBody Attraction a) 
- { 
-	 return service.updateAttraction(a);
+ public ApiResponse updateAttraction(@RequestBody Attraction a)
+ {
+  return new ApiResponse(service.updateAttraction(a), "SUCCESS");
  }
 
  @DeleteMapping("/attractions/{id}")
- public String deleteAttraction(@PathVariable int id) 
- { 
-	 return service.deleteAttraction(id);
+ public ApiResponse deleteAttraction(@PathVariable int id)
+ {
+  return new ApiResponse(service.deleteAttraction(id), "SUCCESS");
  }
 
- //BOOKINGS
+ // BOOKINGS
  @GetMapping("/bookings")
- public List<Booking> bookings() 
- { 
-	 return service.getAllBookings();
- }
-
- @GetMapping("/bookings/status/{status}")
- public List<Booking> bookingsByStatus(@PathVariable String status) {
-  return service.getBookingsByStatus(status);
- }
-
- @GetMapping("/bookings/payment/{status}")
- public List<Booking> bookingsByPayment(@PathVariable String status) {
-  return service.getBookingsByPaymentStatus(status);
+ public ApiResponse bookings()
+ {
+  return new ApiResponse("Bookings", "SUCCESS", service.getAllBookings());
  }
 }

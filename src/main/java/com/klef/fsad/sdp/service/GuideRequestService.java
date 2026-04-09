@@ -5,9 +5,9 @@ import com.klef.fsad.sdp.entity.GuideRequest;
 
 public interface GuideRequestService 
 {
- String createRequest(GuideRequest r);
+    String createRequest(GuideRequest r);
 
- List<GuideRequest> getGuideRequests(int guideId);
+    List<GuideRequest> getGuideRequests(int guideId);
 
- String updateStatus(int id,String status);
+    String updateStatus(int id, String status);
 }

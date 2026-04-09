@@ -6,7 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.klef.fsad.sdp.dto.ApiResponse;
+import com.klef.fsad.sdp.dto.AuthResponse;
+import com.klef.fsad.sdp.dto.LoginRequest;
 import com.klef.fsad.sdp.entity.*;
+import com.klef.fsad.sdp.security.JwtUtil;
 import com.klef.fsad.sdp.service.TouristService;
 
 @RestController
@@ -14,65 +18,99 @@ import com.klef.fsad.sdp.service.TouristService;
 @CrossOrigin("*")
 public class TouristController 
 {
- @Autowired
- private TouristService service;
+    @Autowired
+    private TouristService service;
 
- @PostMapping("/register")
- public String register(@RequestBody Tourist t)
- {
-	 service.register(t);
-	 return "Tourist Registered Successfully";
- }
+    @Autowired
+    private JwtUtil jwtUtil;
 
- @PostMapping("/login")
- public ResponseEntity<?> login(@RequestBody Tourist t)
- {
-     Tourist user = service.login(t.getEmail(), t.getPassword());
+    // ===================== REGISTER =====================
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse> register(@RequestBody Tourist t)
+    {
+        String msg = service.register(t);
 
-     if(user != null)
-     {
-         return ResponseEntity.ok(user);
-     }
-     else
-     {
-         return ResponseEntity.status(401).body("Invalid Credentials");
-     }
- }
- 
- @PutMapping("/update")
- public String update(@RequestBody Tourist t)
- {
-  return service.updateProfile(t);
- }
+        return ResponseEntity.ok(
+            new ApiResponse(msg, "SUCCESS")
+        );
+    }
 
- 
- @GetMapping("/homestays")
- public List<Homestay> homestays()
- {
-  return service.viewHomestays();
- }
+    // ===================== LOGIN =====================
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest req)
+    {
+        Tourist user = service.login(req.getEmail(), req.getPassword());
 
- @GetMapping("/homestays/search/{location}")
- public List<Homestay> searchHomestays(@PathVariable String location)
- {
-  return service.searchHomestays(location);
- }
+        if (user == null)
+        {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse("Invalid Credentials", "FAIL"));
+        }
 
- @GetMapping("/attractions")
- public List<Attraction> attractions()
- {
-  return service.viewAttractions();
- }
+        String token = jwtUtil.generateToken(user.getEmail(), "TOURIST");
 
- @GetMapping("/attractions/search/{location}")
- public List<Attraction> searchAttractions(@PathVariable String location)
- {
-  return service.searchAttractions(location);
- }
+        return ResponseEntity.ok(
+            new AuthResponse(token, "TOURIST", user)
+        );
+    }
 
- @GetMapping("/guides")
- public List<Guide> guides()
- {
-  return service.viewGuides();
- }
+    // ===================== UPDATE PROFILE =====================
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse> update(@RequestBody Tourist t)
+    {
+        String msg = service.updateProfile(t);
+
+        return ResponseEntity.ok(
+            new ApiResponse(msg, "SUCCESS")
+        );
+    }
+
+    // ===================== HOMESTAYS =====================
+    @GetMapping("/homestays")
+    public ResponseEntity<List<Homestay>> homestays()
+    {
+        return ResponseEntity.ok(service.viewHomestays());
+    }
+
+    // ✅ FILTER BY LOCATION
+    @GetMapping("/homestays/search/{location}")
+    public ResponseEntity<List<Homestay>> searchHomestays(@PathVariable String location)
+    {
+        return ResponseEntity.ok(service.searchHomestays(location));
+    }
+
+    // ===================== ATTRACTIONS =====================
+    @GetMapping("/attractions")
+    public ResponseEntity<List<Attraction>> attractions()
+    {
+        return ResponseEntity.ok(service.viewAttractions());
+    }
+
+    // ✅ FILTER BY LOCATION
+    @GetMapping("/attractions/search/{location}")
+    public ResponseEntity<List<Attraction>> searchAttractions(@PathVariable String location)
+    {
+        return ResponseEntity.ok(service.searchAttractions(location));
+    }
+    
+ // ✅ GET TOURIST BY ID (VERY IMPORTANT)
+    @GetMapping("/{id}")
+    public ResponseEntity<Tourist> getTouristById(@PathVariable int id)
+    {
+        Tourist t = service.getTouristById(id);
+
+        if (t == null)
+        {
+            throw new RuntimeException("Tourist Not Found");
+        }
+
+        return ResponseEntity.ok(t);
+    }
+    // ===================== GUIDES =====================
+    @GetMapping("/guides")
+    public ResponseEntity<List<Guide>> guides()
+    {
+        return ResponseEntity.ok(service.viewGuides());
+    }
+    
 }

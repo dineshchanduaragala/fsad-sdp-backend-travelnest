@@ -1,5 +1,6 @@
 package com.klef.fsad.sdp.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,111 +12,135 @@ import com.klef.fsad.sdp.repository.BookingRepository;
 @Service
 public class BookingServiceImpl implements BookingService
 {
- @Autowired
- private BookingRepository repo;
+    @Autowired
+    private BookingRepository repo;
 
- @Override
- public String createBooking(Booking b) 
- {
-  b.setPaymentStatus("PENDING");
-  b.setBookingStatus("REQUESTED");
+    // ===================== CREATE =====================
+    @Override
+    public String createBooking(Booking b) 
+    {
+        // Validate dates
+        if (b.getCheckIn() == null || b.getCheckOut() == null)
+            return "Check-in and Check-out required";
 
-  repo.save(b);
-  return "Booking Request Sent";
- }
+        if (b.getCheckOut().isBefore(b.getCheckIn()))
+            return "Invalid Dates";
 
- // TOURIST BOOKINGS
- @Override
- public List<Booking> getTouristBookings(int touristId) 
- {
-  return repo.findByTouristId(touristId);
- }
+        if (b.getCheckIn().isBefore(LocalDate.now()))
+            return "Check-in cannot be in past";
 
- // HOST BOOKINGS
- @Override
- public List<Booking> getHostBookings(int hostId) 
- {
-  return repo.findByHostId(hostId);
- }
+        b.setPaymentStatus("PENDING");
+        b.setBookingStatus("REQUESTED");
 
- // HOST ACTIONS
- @Override
- public String confirmBooking(int id) 
- {
-  Booking b = repo.findById(id).orElse(null);
+        repo.save(b);
+        return "Booking Request Sent Successfully";
+    }
 
-  if(b!=null)
-  {
-   b.setBookingStatus("CONFIRMED");
-   repo.save(b);
-   return "Booking Confirmed";
-  }
+    // ===================== TOURIST =====================
+    @Override
+    public List<Booking> getTouristBookings(int touristId) 
+    {
+        return repo.findByTouristId(touristId);
+    }
 
-  return "Booking Not Found";
- }
+    // ===================== HOST =====================
+    @Override
+    public List<Booking> getHostBookings(int hostId) 
+    {
+        return repo.findByHostId(hostId);
+    }
 
- @Override
- public String rejectBooking(int id) 
- {
-  Booking b = repo.findById(id).orElse(null);
+    // ===================== CONFIRM =====================
+    @Override
+    public String confirmBooking(int id) 
+    {
+        Booking b = repo.findById(id).orElse(null);
 
-  if(b!=null)
-  {
-   b.setBookingStatus("REJECTED");
-   repo.save(b);
-   return "Booking Rejected";
-  }
+        if (b == null)
+            return "Booking Not Found";
 
-  return "Booking Not Found";
- }
+        if (!b.getBookingStatus().equals("REQUESTED"))
+            return "Only Requested bookings can be confirmed";
 
- @Override
- public String completeBooking(int id) 
- {
-  Booking b = repo.findById(id).orElse(null);
+        b.setBookingStatus("CONFIRMED");
+        repo.save(b);
 
-  if(b!=null)
-  {
-   b.setBookingStatus("COMPLETED");
-   repo.save(b);
-   return "Booking Completed";
-  }
+        return "Booking Confirmed Successfully";
+    }
 
-  return "Booking Not Found";
- }
+    // ===================== REJECT =====================
+    @Override
+    public String rejectBooking(int id) 
+    {
+        Booking b = repo.findById(id).orElse(null);
 
- // PAYMENT UPDATE
- @Override
- public String updatePayment(int id,String status) 
- {
-  Booking b = repo.findById(id).orElse(null);
+        if (b == null)
+            return "Booking Not Found";
 
-  if(b!=null)
-  {
-   b.setPaymentStatus(status);
-   repo.save(b);
-   return "Payment Updated";
-  }
+        if (!b.getBookingStatus().equals("REQUESTED"))
+            return "Only Requested bookings can be rejected";
 
-  return "Booking Not Found";
- }
+        b.setBookingStatus("REJECTED");
+        repo.save(b);
 
- // ADMIN
- @Override
- public List<Booking> getAllBookings() 
- {
-  return repo.findAll();
- }
+        return "Booking Rejected Successfully";
+    }
 
- @Override
- public List<Booking> getByStatus(String status) 
- {
-  return repo.findByBookingStatus(status);
- }
+    // ===================== COMPLETE =====================
+    @Override
+    public String completeBooking(int id) 
+    {
+        Booking b = repo.findById(id).orElse(null);
 
- @Override
- public List<Booking> getByPaymentStatus(String status) 
- {
-  return repo.findByPaymentStatus(status);
- }
+        if (b == null)
+            return "Booking Not Found";
+
+        if (!b.getBookingStatus().equals("CONFIRMED"))
+            return "Only Confirmed bookings can be completed";
+
+        b.setBookingStatus("COMPLETED");
+        repo.save(b);
+
+        return "Booking Completed Successfully";
+    }
+
+    // ===================== PAYMENT =====================
+    @Override
+    public String updatePayment(int id, String status) 
+    {
+        Booking b = repo.findById(id).orElse(null);
+
+        if (b == null)
+            return "Booking Not Found";
+
+        if (!b.getBookingStatus().equals("CONFIRMED"))
+            return "Payment allowed only after confirmation";
+
+        if (!(status.equals("PAID") || status.equals("PENDING")))
+            return "Invalid Payment Status";
+
+        b.setPaymentStatus(status);
+        repo.save(b);
+
+        return "Payment Updated Successfully";
+    }
+
+    // ===================== ADMIN =====================
+    @Override
+    public List<Booking> getAllBookings() 
+    {
+        return repo.findAll();
+    }
+
+    @Override
+    public List<Booking> getByStatus(String status) 
+    {
+        return repo.findByBookingStatus(status);
+    }
+
+    @Override
+    public List<Booking> getByPaymentStatus(String status) 
+    {
+        return repo.findByPaymentStatus(status);
+    }
 }

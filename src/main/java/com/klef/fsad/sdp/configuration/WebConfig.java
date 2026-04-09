@@ -12,4 +12,14 @@ public class WebConfig implements WebMvcConfigurer
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/");
     }
+
+    // ✅ VERY IMPORTANT FOR FRONTEND (React)
+    @Override
+    public void addCorsMappings(CorsRegistry registry) 
+    {
+        registry.addMapping("/**")
+                .allowedOrigins("*")   // change to frontend URL in production
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*");
+    }
 }

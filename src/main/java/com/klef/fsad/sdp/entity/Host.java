@@ -25,32 +25,80 @@ public class Host
  @Column(nullable=false)
  private String location;
 
- private boolean approved;
- private boolean available;
+ private boolean approved = false;
+ private boolean available = true;
 
- // GETTERS & SETTERS
+ private double rating = 0.0;
 
- public int getId() { return id; }
- public void setId(int id) { this.id = id; }
+ public int getId() {
+	return id;
+ }
 
- public String getName() { return name; }
- public void setName(String name) { this.name = name; }
+ public void setId(int id) {
+	this.id = id;
+ }
 
- public String getEmail() { return email; }
- public void setEmail(String email) { this.email = email; }
+ public String getName() {
+	return name;
+ }
 
- public String getPassword() { return password; }
- public void setPassword(String password) { this.password = password; }
+ public void setName(String name) {
+	this.name = name;
+ }
 
- public String getPhone() { return phone; }
- public void setPhone(String phone) { this.phone = phone; }
+ public String getEmail() {
+	return email;
+ }
 
- public String getLocation() { return location; }
- public void setLocation(String location) { this.location = location; }
+ public void setEmail(String email) {
+	this.email = email;
+ }
 
- public boolean isApproved() { return approved; }
- public void setApproved(boolean approved) { this.approved = approved; }
+ public String getPassword() {
+	return password;
+ }
 
- public boolean isAvailable() { return available; }
- public void setAvailable(boolean available) { this.available = available; }
+ public void setPassword(String password) {
+	this.password = password;
+ }
+
+ public String getPhone() {
+	return phone;
+ }
+
+ public void setPhone(String phone) {
+	this.phone = phone;
+ }
+
+ public String getLocation() {
+	return location;
+ }
+
+ public void setLocation(String location) {
+	this.location = location;
+ }
+
+ public boolean isApproved() {
+	return approved;
+ }
+
+ public void setApproved(boolean approved) {
+	this.approved = approved;
+ }
+
+ public boolean isAvailable() {
+	return available;
+ }
+
+ public void setAvailable(boolean available) {
+	this.available = available;
+ }
+
+ public double getRating() {
+	return rating;
+ }
+
+ public void setRating(double rating) {
+	this.rating = rating;
+ }
 }

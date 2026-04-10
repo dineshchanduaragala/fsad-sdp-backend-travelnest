@@ -1,7 +1,6 @@
 package com.klef.fsad.sdp.controller;
 
 import java.util.List;
-
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,174 +17,195 @@ import com.klef.fsad.sdp.service.AdminService;
 @CrossOrigin("*")
 public class AdminController
 {
- @Autowired
- private AdminService service;
+    @Autowired
+    private AdminService service;
 
- @Autowired
- private JwtUtil jwtUtil;
+    @Autowired
+    private JwtUtil jwtUtil;
 
- // LOGIN
- @PostMapping("/login")
- public ResponseEntity<?> login(@RequestBody LoginRequest req)
- {
-  Admin user = service.verifyAdminLogin(
-      req.getEmail(),
-      req.getPassword(),
-      req.getPin()
-  );
+    // ================= LOGIN =================
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest req)
+    {
+        // ✅ FIXED (username, not email)
+        Admin user = service.verifyAdminLogin(
+                req.getUsername(),
+                req.getPassword(),
+                req.getPin()
+        );
 
-  String token = jwtUtil.generateToken(user.getUsername(), "ADMIN");
+        if (user == null)
+        {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse("Invalid Admin Credentials", "FAIL"));
+        }
 
-  return ResponseEntity.ok(new AuthResponse(token, "ADMIN", user));
- }
+        String token = jwtUtil.generateToken(user.getUsername(), "ADMIN");
 
- // DASHBOARD
- @GetMapping("/dashboard")
- public ApiResponse dashboard()
- {
-  return new ApiResponse("Dashboard Data", "SUCCESS", Map.of(
-      "tourists", service.getTotalTourists(),
-      "hosts", service.getTotalHosts(),
-      "guides", service.getTotalGuides(),
-      "homestays", service.getTotalHomestays(),
-      "attractions", service.getTotalAttractions(),
-      "bookings", service.getTotalBookings()
-  ));
- }
- 
-//================= TOURISTS =================
-@GetMapping("/tourists")
-public ApiResponse getAllTourists()
-{
-  return new ApiResponse(
-      "Tourists List",
-      "SUCCESS",
-      service.getAllTourists()
-  );
-}
+        return ResponseEntity.ok(new AuthResponse(token, "ADMIN", user));
+    }
 
- // HOSTS
- @GetMapping("/hosts")
- public ApiResponse allHosts()
- {
-  return new ApiResponse("Hosts List", "SUCCESS", service.getAllHosts());
- }
+    // ================= DASHBOARD =================
+    @GetMapping("/dashboard")
+    public ApiResponse dashboard()
+    {
+        return new ApiResponse("Dashboard Data", "SUCCESS", Map.of(
+                "tourists", service.getTotalTourists(),
+                "hosts", service.getTotalHosts(),
+                "guides", service.getTotalGuides(),
+                "homestays", service.getTotalHomestays(),
+                "attractions", service.getTotalAttractions(),
+                "bookings", service.getTotalBookings()
+        ));
+    }
 
- @GetMapping("/hosts/pending")
- public ApiResponse pendingHosts()
- {
-  return new ApiResponse("Pending Hosts", "SUCCESS", service.getPendingHosts());
- }
+    // ================= TOURISTS =================
+    @GetMapping("/tourists")
+    public ApiResponse getAllTourists()
+    {
+        return new ApiResponse(
+                "Tourists List",
+                "SUCCESS",
+                service.getAllTourists()
+        );
+    }
 
- @PostMapping("/hosts/approve/{id}")
- public ApiResponse approveHost(@PathVariable int id)
- {
-  return new ApiResponse(service.approveHost(id), "SUCCESS");
- }
+    // ================= HOSTS =================
+    @GetMapping("/hosts")
+    public ApiResponse allHosts()
+    {
+        return new ApiResponse("Hosts List", "SUCCESS", service.getAllHosts());
+    }
 
- @PostMapping("/hosts/reject/{id}")
- public ApiResponse rejectHost(@PathVariable int id)
- {
-  return new ApiResponse(service.rejectHost(id), "SUCCESS");
- }
+    @GetMapping("/hosts/pending")
+    public ApiResponse pendingHosts()
+    {
+        return new ApiResponse("Pending Hosts", "SUCCESS", service.getPendingHosts());
+    }
 
- // GUIDES
- @GetMapping("/guides")
- public ApiResponse allGuides()
- {
-  return new ApiResponse("Guides List", "SUCCESS", service.getAllGuides());
- }
+    @PostMapping("/hosts/approve/{id}")
+    public ApiResponse approveHost(@PathVariable int id)
+    {
+        return new ApiResponse(service.approveHost(id), "SUCCESS");
+    }
 
- @GetMapping("/guides/pending")
- public ApiResponse pendingGuides()
- {
-  return new ApiResponse("Pending Guides", "SUCCESS", service.getPendingGuides());
- }
+    @PostMapping("/hosts/reject/{id}")
+    public ApiResponse rejectHost(@PathVariable int id)
+    {
+        return new ApiResponse(service.rejectHost(id), "SUCCESS");
+    }
 
- @PostMapping("/guides/approve/{id}")
- public ApiResponse approveGuide(@PathVariable int id)
- {
-  return new ApiResponse(service.approveGuide(id), "SUCCESS");
- }
+    // ✅ CORRECT UPDATE HOST (FINAL FIX)
+    @PutMapping("/hosts/update")
+    public ApiResponse updateHost(@RequestBody Host h)
+    {
+        return new ApiResponse(service.updateHost(h), "SUCCESS");
+    }
 
- @PostMapping("/guides/reject/{id}")
- public ApiResponse rejectGuide(@PathVariable int id)
- {
-  return new ApiResponse(service.rejectGuide(id), "SUCCESS");
- }
+    // ================= GUIDES =================
+    @GetMapping("/guides")
+    public ApiResponse allGuides()
+    {
+        return new ApiResponse("Guides List", "SUCCESS", service.getAllGuides());
+    }
 
- // HOMESTAYS
- @GetMapping("/homestays")
- public ApiResponse allHomestays()
- {
-  return new ApiResponse("Homestays", "SUCCESS", service.getAllHomestays());
- }
+    @GetMapping("/guides/pending")
+    public ApiResponse pendingGuides()
+    {
+        return new ApiResponse("Pending Guides", "SUCCESS", service.getPendingGuides());
+    }
 
- @GetMapping("/homestays/pending")
- public ApiResponse pendingHomestays()
- {
-  return new ApiResponse("Pending Homestays", "SUCCESS", service.getPendingHomestays());
- }
+    @PostMapping("/guides/approve/{id}")
+    public ApiResponse approveGuide(@PathVariable int id)
+    {
+        return new ApiResponse(service.approveGuide(id), "SUCCESS");
+    }
 
- @PostMapping("/homestays")
- public ApiResponse addHomestay(@RequestBody Homestay h)
- {
-  return new ApiResponse(service.addHomestay(h), "SUCCESS");
- }
+    @PostMapping("/guides/reject/{id}")
+    public ApiResponse rejectGuide(@PathVariable int id)
+    {
+        return new ApiResponse(service.rejectGuide(id), "SUCCESS");
+    }
 
- @PutMapping("/homestays")
- public ApiResponse updateHomestay(@RequestBody Homestay h)
- {
-  return new ApiResponse(service.updateHomestay(h), "SUCCESS");
- }
+    // ================= HOMESTAYS =================
+    @GetMapping("/homestays")
+    public ApiResponse allHomestays()
+    {
+        return new ApiResponse("Homestays", "SUCCESS", service.getAllHomestays());
+    }
 
- @PostMapping("/homestays/approve/{id}")
- public ApiResponse approveHomestay(@PathVariable int id)
- {
-  return new ApiResponse(service.approveHomestay(id), "SUCCESS");
- }
+    @GetMapping("/homestays/pending")
+    public ApiResponse pendingHomestays()
+    {
+        return new ApiResponse("Pending Homestays", "SUCCESS", service.getPendingHomestays());
+    }
 
- @PostMapping("/homestays/reject/{id}")
- public ApiResponse rejectHomestay(@PathVariable int id)
- {
-  return new ApiResponse(service.rejectHomestay(id), "SUCCESS");
- }
+    @PostMapping("/homestays")
+    public ApiResponse addHomestay(@RequestBody Homestay h)
+    {
+        return new ApiResponse(service.addHomestay(h), "SUCCESS");
+    }
 
- @DeleteMapping("/homestays/{id}")
- public ApiResponse deleteHomestay(@PathVariable int id)
- {
-  return new ApiResponse(service.deleteHomestay(id), "SUCCESS");
- }
+    @PutMapping("/homestays")
+    public ApiResponse updateHomestay(@RequestBody Homestay h)
+    {
+        return new ApiResponse(service.updateHomestay(h), "SUCCESS");
+    }
 
- // ATTRACTIONS
- @GetMapping("/attractions")
- public ApiResponse attractions()
- {
-  return new ApiResponse("Attractions", "SUCCESS", service.getAllAttractions());
- }
+    @PostMapping("/homestays/approve/{id}")
+    public ApiResponse approveHomestay(@PathVariable int id)
+    {
+        return new ApiResponse(service.approveHomestay(id), "SUCCESS");
+    }
 
- @PostMapping("/attractions")
- public ApiResponse addAttraction(@RequestBody Attraction a)
- {
-  return new ApiResponse(service.addAttraction(a), "SUCCESS");
- }
+    @PostMapping("/homestays/reject/{id}")
+    public ApiResponse rejectHomestay(@PathVariable int id)
+    {
+        return new ApiResponse(service.rejectHomestay(id), "SUCCESS");
+    }
 
- @PutMapping("/attractions")
- public ApiResponse updateAttraction(@RequestBody Attraction a)
- {
-  return new ApiResponse(service.updateAttraction(a), "SUCCESS");
- }
+    @DeleteMapping("/homestays/{id}")
+    public ApiResponse deleteHomestay(@PathVariable int id)
+    {
+        return new ApiResponse(service.deleteHomestay(id), "SUCCESS");
+    }
 
- @DeleteMapping("/attractions/{id}")
- public ApiResponse deleteAttraction(@PathVariable int id)
- {
-  return new ApiResponse(service.deleteAttraction(id), "SUCCESS");
- }
+    // ================= ATTRACTIONS =================
+    @GetMapping("/attractions")
+    public ApiResponse attractions()
+    {
+        return new ApiResponse("Attractions", "SUCCESS", service.getAllAttractions());
+    }
 
- // BOOKINGS
- @GetMapping("/bookings")
- public ApiResponse bookings()
- {
-  return new ApiResponse("Bookings", "SUCCESS", service.getAllBookings());
- }
+    @PostMapping("/attractions")
+    public ApiResponse addAttraction(@RequestBody Attraction a)
+    {
+        return new ApiResponse(service.addAttraction(a), "SUCCESS");
+    }
+
+    @PutMapping("/attractions")
+    public ApiResponse updateAttraction(@RequestBody Attraction a)
+    {
+        return new ApiResponse(service.updateAttraction(a), "SUCCESS");
+    }
+
+    @DeleteMapping("/attractions/{id}")
+    public ApiResponse deleteAttraction(@PathVariable int id)
+    {
+        return new ApiResponse(service.deleteAttraction(id), "SUCCESS");
+    }
+
+    // ================= BOOKINGS =================
+    @GetMapping("/bookings")
+    public ApiResponse bookings()
+    {
+        return new ApiResponse("Bookings", "SUCCESS", service.getAllBookings());
+    }
+    
+ // ================= DELETE HOST =================
+    @DeleteMapping("/hosts/delete/{id}")
+    public ApiResponse deleteHost(@PathVariable int id)
+    {
+        return new ApiResponse(service.deleteHost(id), "SUCCESS");
+    }
 }

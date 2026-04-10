@@ -18,6 +18,8 @@ public interface AdminService
     long getTotalBookings();
     
     List<Tourist> getAllTourists();
+    String updateHost(Host h);
+    String deleteHost(int id);
 
     // ===================== TOURISTS =====================
     List<Tourist> viewAllTourists();

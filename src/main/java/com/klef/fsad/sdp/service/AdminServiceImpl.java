@@ -230,4 +230,36 @@ public class AdminServiceImpl implements AdminService
     {
         return bookingRepo.findByPaymentStatus(paymentStatus);
     }
+    
+    @Override
+    public String updateHost(Host h)
+    {
+        Host existing = hostRepo.findById(h.getId()).orElse(null);
+
+        if (existing == null)
+            return "Host Not Found";
+
+        // keep approval unchanged
+        h.setApproved(existing.isApproved());
+
+        hostRepo.save(h);
+
+        return "Host Updated Successfully";
+    }
+    
+    @Override
+    public String deleteHost(int id)
+    {
+        Host h = hostRepo.findById(id).orElse(null);
+
+        if (h == null)
+            return "Host Not Found";
+
+        try {
+            hostRepo.deleteById(id);
+            return "Host Deleted Successfully";
+        } catch (Exception e) {
+            return "Cannot delete: Host has linked data";
+        }
+    }
 }

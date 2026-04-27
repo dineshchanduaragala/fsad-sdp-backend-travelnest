@@ -71,7 +71,7 @@ public class AdminController
         return new ApiResponse("SUCCESS", "SUCCESS", service.getAllTourists());
     }
     
- // ================= TOURISTS =================
+ // ================= TOURISTS 
 
     @PutMapping("/tourists")
     public ApiResponse updateTourist(@RequestBody Tourist t)

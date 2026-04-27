@@ -7,7 +7,11 @@ public class LoginRequest
     private String email;    // for others
     private String password;
     private String pin;      // only for admin
+    private String otp;
 
+    public String getOtp() { return otp; }
+    public void setOtp(String otp) { this.otp = otp; }
+    
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 

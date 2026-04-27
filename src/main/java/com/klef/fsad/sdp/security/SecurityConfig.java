@@ -8,6 +8,7 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.cors.*;
+
 import java.util.List;
 
 @Configuration
@@ -22,15 +23,17 @@ public class SecurityConfig {
         return username -> null;
     }
 
-    // ✅ CORS CONFIGURATION (VERY IMPORTANT)
+    // ===================== ✅ FIXED CORS =====================
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:2031")); // frontend
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        // 🔥 IMPORTANT FIX
+        config.setAllowedOriginPatterns(List.of("*"));   // allow all origins
+        config.setAllowedMethods(List.of("*"));          // allow all methods
+        config.setAllowedHeaders(List.of("*"));          // allow all headers
+
+        config.setAllowCredentials(false); // 🔥 VERY IMPORTANT (for images)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -38,10 +41,11 @@ public class SecurityConfig {
         return source;
     }
 
+    // ===================== SECURITY =====================
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> {}) // 🔥 ENABLE CORS
+            .cors(cors -> {}) // ✅ enable CORS
             .csrf(csrf -> csrf.disable())
 
             .formLogin(form -> form.disable())
@@ -53,16 +57,27 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
+
+                    // ✅ PUBLIC AUTH
                     "/auth/**",
                     "/adminapi/login",
+                    "/adminapi/dashboard",
                     "/hostapi/login",
                     "/touristapi/login",
                     "/guideapi/login",
                     "/**/register",
+
+                    // 🔥🔥🔥 CRITICAL FIX FOR IMAGES
+                    "/homestayapi/image/**",
+                    "/homestayapi/qr/**",
+                    "/attractionapi/image/**",
+
+                    // OTHER
                     "/uploads/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**"
                 ).permitAll()
+
                 .anyRequest().authenticated()
             )
 

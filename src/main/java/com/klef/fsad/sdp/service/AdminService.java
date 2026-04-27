@@ -23,6 +23,8 @@ public interface AdminService
 
     // ===================== TOURISTS =====================
     List<Tourist> viewAllTourists();
+    String updateTourist(Tourist t);
+    String deleteTourist(int id);
 
     // ===================== HOST MANAGEMENT =====================
     List<Host> getAllHosts();

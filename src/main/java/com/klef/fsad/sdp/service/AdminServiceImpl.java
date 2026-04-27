@@ -51,6 +51,25 @@ public class AdminServiceImpl implements AdminService
     { 
         return touristRepo.findAll();
     }
+    
+    @Override
+    public String updateTourist(Tourist t)
+    {
+        Tourist existing = touristRepo.findById(t.getId()).orElse(null);
+
+        if (existing == null)
+            return "Tourist Not Found";
+
+        touristRepo.save(t);
+        return "Tourist Updated Successfully";
+    }
+
+    @Override
+    public String deleteTourist(int id)
+    {
+        touristRepo.deleteById(id);
+        return "Tourist Deleted Successfully";
+    }
 
     // ===================== HOSTS =====================
     public List<Host> getAllHosts() 

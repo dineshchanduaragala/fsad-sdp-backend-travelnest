@@ -20,7 +20,11 @@ public class Attraction
  @Column(length=500)
  private String description;
 
- private String imagePath;
+ @Lob
+ @Column(columnDefinition = "LONGBLOB")
+ private byte[] image;
+
+ private String imageType;
 
  private double entryFee;
 
@@ -62,12 +66,20 @@ public class Attraction
 	this.description = description;
  }
 
- public String getImagePath() {
-	return imagePath;
+ public byte[] getImage() {
+	return image;
  }
 
- public void setImagePath(String imagePath) {
-	this.imagePath = imagePath;
+ public void setImage(byte[] image) {
+	this.image = image;
+ }
+
+ public String getImageType() {
+	return imageType;
+ }
+
+ public void setImageType(String imageType) {
+	this.imageType = imageType;
  }
 
  public double getEntryFee() {

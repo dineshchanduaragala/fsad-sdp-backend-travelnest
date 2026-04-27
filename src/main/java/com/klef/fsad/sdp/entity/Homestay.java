@@ -22,8 +22,17 @@ public class Homestay
  @Column(length = 500)
  private String facilities;
 
- private String imagePath;
- private String qrPath;
+ @Lob
+ @Column(columnDefinition = "LONGBLOB")
+ private byte[] image;
+
+ private String imageType;
+
+ @Lob
+ @Column(columnDefinition = "LONGBLOB")
+ private byte[] qrImage;
+
+ private String qrImageType;
 
  private boolean available = true;
  private boolean approved = false;
@@ -84,20 +93,36 @@ public class Homestay
 	this.facilities = facilities;
  }
 
- public String getImagePath() {
-	return imagePath;
+ public byte[] getImage() {
+	return image;
  }
 
- public void setImagePath(String imagePath) {
-	this.imagePath = imagePath;
+ public void setImage(byte[] image) {
+	this.image = image;
  }
 
- public String getQrPath() {
-	return qrPath;
+ public String getImageType() {
+	return imageType;
  }
 
- public void setQrPath(String qrPath) {
-	this.qrPath = qrPath;
+ public void setImageType(String imageType) {
+	this.imageType = imageType;
+ }
+
+ public byte[] getQrImage() {
+	return qrImage;
+ }
+
+ public void setQrImage(byte[] qrImage) {
+	this.qrImage = qrImage;
+ }
+
+ public String getQrImageType() {
+	return qrImageType;
+ }
+
+ public void setQrImageType(String qrImageType) {
+	this.qrImageType = qrImageType;
  }
 
  public boolean isAvailable() {
@@ -147,4 +172,5 @@ public class Homestay
  public void setCreatedAt(LocalDateTime createdAt) {
 	this.createdAt = createdAt;
  }
+ 
 }

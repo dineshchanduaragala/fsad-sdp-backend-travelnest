@@ -3,13 +3,13 @@ package com.klef.fsad.sdp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.klef.fsad.sdp.dto.ApiResponse;
 import com.klef.fsad.sdp.entity.Attraction;
 import com.klef.fsad.sdp.service.AttractionService;
-import com.klef.fsad.sdp.util.FileUploadUtil;
 
 @RestController
 @RequestMapping("attractionapi")
@@ -32,16 +32,15 @@ public class AttractionController
  {
   try 
   {
-   String imagePath = FileUploadUtil.saveFile(image, "attractions");
-
+	  
    Attraction a = new Attraction();
    a.setName(name);
    a.setLocation(location);
    a.setDescription(description);
    a.setEntryFee(entryFee);
    a.setTimings(timings);
-   a.setImagePath(imagePath);
-
+   a.setImage(image.getBytes());
+   a.setImageType(image.getContentType());
    String msg = service.addAttraction(a);
 
    return new ApiResponse(msg, "SUCCESS");
@@ -99,4 +98,13 @@ public class AttractionController
 
   return new ApiResponse("Search Results", "SUCCESS", list);
  }
+ @GetMapping("/image/{id}")
+ public ResponseEntity<byte[]> getImage(@PathVariable int id) {
+     Attraction a = service.getAttractionById(id);
+
+     return ResponseEntity.ok()
+             .contentType(org.springframework.http.MediaType.valueOf(a.getImageType()))
+             .body(a.getImage());
+ }
+ 
 }

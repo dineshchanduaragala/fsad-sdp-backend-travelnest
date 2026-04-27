@@ -3,6 +3,7 @@ package com.klef.fsad.sdp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.klef.fsad.sdp.dto.ApiResponse;
 import com.klef.fsad.sdp.entity.Homestay;
 import com.klef.fsad.sdp.service.HomestayService;
-import com.klef.fsad.sdp.util.FileUploadUtil;
 
 @RestController
 @RequestMapping("homestayapi")
@@ -20,7 +20,7 @@ public class HomestayController
     @Autowired
     private HomestayService service;
 
-    // ===================== HOST ADD =====================
+    // ===================== ADD =====================
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> add(
         @RequestParam String name,
@@ -34,14 +34,6 @@ public class HomestayController
     ) {
         try 
         {
-            String imagePath = (image != null) 
-                    ? FileUploadUtil.saveFile(image, "homestays") 
-                    : null;
-
-            String qrPath = (qr != null) 
-                    ? FileUploadUtil.saveFile(qr, "qr") 
-                    : null;
-
             Homestay h = new Homestay();
             h.setName(name);
             h.setLocation(location);
@@ -49,65 +41,118 @@ public class HomestayController
             h.setPrice(price);
             h.setFacilities(facilities);
             h.setHostId(hostId);
-            h.setImagePath(imagePath);
-            h.setQrPath(qrPath);
+
+            if (image != null && !image.isEmpty()) {
+                h.setImage(image.getBytes());
+                h.setImageType(image.getContentType());
+            }
+
+            if (qr != null && !qr.isEmpty()) {
+                h.setQrImage(qr.getBytes());
+                h.setQrImageType(qr.getContentType());
+            }
 
             String msg = service.addHomestay(h);
 
-            return ResponseEntity.ok(
-                new ApiResponse(msg, "SUCCESS")
-            );
+            return ResponseEntity.ok(new ApiResponse(msg, "SUCCESS"));
+
         } 
         catch (Exception e) 
         {
+            e.printStackTrace();
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse("Upload Failed", "FAIL"));
+                .body(new ApiResponse("Upload Failed ❌", "FAIL"));
         }
     }
 
-    // ===================== ADMIN ADD (AUTO APPROVE) =====================
+    // ===================== ADMIN ADD =====================
     @PostMapping("/admin/add")
     public ResponseEntity<ApiResponse> addByAdmin(@RequestBody Homestay h)
     {
-        h.setApproved(true);  // ✅ direct approval
-
+        h.setApproved(true);
         String msg = service.addHomestay(h);
 
-        return ResponseEntity.ok(
-            new ApiResponse(msg, "SUCCESS")
-        );
+        return ResponseEntity.ok(new ApiResponse(msg, "SUCCESS"));
     }
 
-    // ===================== VIEW ALL =====================
+    // ===================== GET ALL =====================
     @GetMapping("/all")
     public ResponseEntity<List<Homestay>> getAll()
     {
         return ResponseEntity.ok(service.getAllHomestays());
     }
 
-    // ===================== VIEW APPROVED =====================
+    // ===================== GET APPROVED =====================
     @GetMapping("/approved")
     public ResponseEntity<List<Homestay>> getApproved()
     {
         return ResponseEntity.ok(service.getApprovedHomestays());
     }
 
-    // ===================== VIEW BY ID =====================
+    // ===================== GET BY ID =====================
     @GetMapping("/{id}")
-    public ResponseEntity<Homestay> getById(@PathVariable int id)
+    public ResponseEntity<?> getById(@PathVariable int id)
     {
-        return ResponseEntity.ok(service.getById(id));
+        Homestay h = service.getById(id);
+
+        if (h == null) {
+            return ResponseEntity.status(404)
+                .body(new ApiResponse("Homestay Not Found ❌", "FAIL"));
+        }
+
+        return ResponseEntity.ok(h);
     }
 
-    // ===================== UPDATE =====================
+    // ===================== UPDATE (🔥 FIXED) =====================
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse> update(@RequestBody Homestay h)
-    {
-        String msg = service.updateHomestay(h);
+    public ResponseEntity<ApiResponse> update(
+        @RequestParam int id,
+        @RequestParam String name,
+        @RequestParam String location,
+        @RequestParam String description,
+        @RequestParam double price,
+        @RequestParam String facilities,
+        @RequestParam boolean available,
+        @RequestParam(required = false) MultipartFile image,
+        @RequestParam(required = false) MultipartFile qr
+    ) {
+        try 
+        {
+            Homestay h = service.getById(id);
 
-        return ResponseEntity.ok(
-            new ApiResponse(msg, "SUCCESS")
-        );
+            if (h == null) {
+                return ResponseEntity.badRequest()
+                    .body(new ApiResponse("Homestay Not Found ❌", "FAIL"));
+            }
+
+            h.setName(name);
+            h.setLocation(location);
+            h.setDescription(description);
+            h.setPrice(price);
+            h.setFacilities(facilities);
+            h.setAvailable(available);
+
+            if (image != null && !image.isEmpty()) {
+                h.setImage(image.getBytes());
+                h.setImageType(image.getContentType());
+            }
+
+            if (qr != null && !qr.isEmpty()) {
+                h.setQrImage(qr.getBytes());
+                h.setQrImageType(qr.getContentType());
+            }
+
+            String msg = service.updateHomestay(h);
+
+            return ResponseEntity.ok(new ApiResponse(msg, "SUCCESS"));
+
+        } 
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                .body(new ApiResponse("Update Failed ❌", "FAIL"));
+        }
     }
 
     // ===================== DELETE =====================
@@ -115,10 +160,7 @@ public class HomestayController
     public ResponseEntity<ApiResponse> delete(@PathVariable int id)
     {
         String msg = service.deleteHomestay(id);
-
-        return ResponseEntity.ok(
-            new ApiResponse(msg, "SUCCESS")
-        );
+        return ResponseEntity.ok(new ApiResponse(msg, "SUCCESS"));
     }
 
     // ===================== APPROVE =====================
@@ -126,10 +168,7 @@ public class HomestayController
     public ResponseEntity<ApiResponse> approve(@PathVariable int id)
     {
         String msg = service.approveHomestay(id);
-
-        return ResponseEntity.ok(
-            new ApiResponse(msg, "SUCCESS")
-        );
+        return ResponseEntity.ok(new ApiResponse(msg, "SUCCESS"));
     }
 
     // ===================== REJECT =====================
@@ -137,13 +176,10 @@ public class HomestayController
     public ResponseEntity<ApiResponse> reject(@PathVariable int id)
     {
         String msg = service.rejectHomestay(id);
-
-        return ResponseEntity.ok(
-            new ApiResponse(msg, "SUCCESS")
-        );
+        return ResponseEntity.ok(new ApiResponse(msg, "SUCCESS"));
     }
 
-    // ===================== SEARCH (FILTER ✔) =====================
+    // ===================== SEARCH =====================
     @GetMapping("/search/{location}")
     public ResponseEntity<List<Homestay>> search(@PathVariable String location)
     {
@@ -155,5 +191,41 @@ public class HomestayController
     public ResponseEntity<List<Homestay>> getHostHomestays(@PathVariable int hostId)
     {
         return ResponseEntity.ok(service.getHostHomestays(hostId));
+    }
+
+    // ===================== IMAGE =====================
+    @GetMapping("/image/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable int id) {
+
+        Homestay h = service.getById(id);
+
+        if (h == null || h.getImage() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String type = h.getImageType();
+
+        if (type == null || type.isEmpty()) {
+            type = "image/jpeg";
+        }
+
+        return ResponseEntity.ok()
+            .header("Access-Control-Allow-Origin", "*")
+            .contentType(MediaType.parseMediaType(type))
+            .body(h.getImage());
+    }
+
+    // ===================== QR =====================
+    @GetMapping("/qr/{id}")
+    public ResponseEntity<byte[]> getQR(@PathVariable int id) {
+        Homestay h = service.getById(id);
+
+        if (h == null || h.getQrImage() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok()
+            .contentType(MediaType.valueOf(h.getQrImageType()))
+            .body(h.getQrImage());
     }
 }

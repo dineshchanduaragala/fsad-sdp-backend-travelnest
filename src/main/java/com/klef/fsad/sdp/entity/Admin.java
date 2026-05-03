@@ -15,7 +15,7 @@ public class Admin
  private String password;
 
  @Column(nullable = false)
- private String pin;
+ private Integer pin;
 
  private String role = "ADMIN";
 
@@ -37,13 +37,13 @@ public class Admin
 	this.password = password;
  }
 
- public String getPin() {
-	return pin;
- }
+ public Integer getPin() {
+	    return pin;
+	}
 
- public void setPin(String pin) {
-	this.pin = pin;
- }
+	public void setPin(Integer pin) {
+	    this.pin = pin;
+	}
 
  public String getRole() {
 	return role;

@@ -17,23 +17,20 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-    // ✅ Disable default user
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> null;
     }
 
-    // ===================== ✅ FIXED CORS =====================
+    // ✅ CORS CONFIG
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // 🔥 IMPORTANT FIX
-        config.setAllowedOriginPatterns(List.of("*"));   // allow all origins
-        config.setAllowedMethods(List.of("*"));          // allow all methods
-        config.setAllowedHeaders(List.of("*"));          // allow all headers
-
-        config.setAllowCredentials(false); // 🔥 VERY IMPORTANT (for images)
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -41,11 +38,11 @@ public class SecurityConfig {
         return source;
     }
 
-    // ===================== SECURITY =====================
+    // ✅ SECURITY CONFIG
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> {}) // ✅ enable CORS
+            .cors(cors -> {})
             .csrf(csrf -> csrf.disable())
 
             .formLogin(form -> form.disable())
@@ -56,28 +53,31 @@ public class SecurityConfig {
             )
 
             .authorizeHttpRequests(auth -> auth
+
+                // ✅ ALLOW EVERYTHING PUBLIC FIRST
                 .requestMatchers(
+                        "/",
+                        "/error",
 
-                    // ✅ PUBLIC AUTH
-                    "/auth/**",
-                    "/adminapi/login",
-                    "/adminapi/dashboard",
-                    "/hostapi/login",
-                    "/touristapi/login",
-                    "/guideapi/login",
-                    "/**/register",
+                        // AUTH
+                        "/auth/**",
+                        "/**/login",
+                        "/**/register",
 
-                    // 🔥🔥🔥 CRITICAL FIX FOR IMAGES
-                    "/homestayapi/image/**",
-                    "/homestayapi/qr/**",
-                    "/attractionapi/image/**",
+                        // SWAGGER (FULL FIX)
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/index.html",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/swagger-config",
 
-                    // OTHER
-                    "/uploads/**",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**"
+                        // PUBLIC APIs
+                        "/homestayapi/**",
+                        "/attractionapi/**"
                 ).permitAll()
 
+                // 🔐 PROTECT REST
                 .anyRequest().authenticated()
             )
 

@@ -6,7 +6,7 @@ public class LoginRequest
     private String username; // for admin
     private String email;    // for others
     private String password;
-    private String pin;      // only for admin
+    private Integer pin;      // only for admin
     private String otp;
 
     public String getOtp() { return otp; }
@@ -23,7 +23,11 @@ public class LoginRequest
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-
-    public String getPin() { return pin; }
-    public void setPin(String pin) { this.pin = pin; }
+    
+	public Integer getPin() {
+		return pin;
+	}
+	public void setPin(Integer pin) {
+		this.pin = pin;
+	}
 }

@@ -30,8 +30,6 @@ public class Attraction
 
  private String timings;
 
- private double rating = 0.0;
-
  private LocalDateTime createdAt = LocalDateTime.now();
 
  public int getId() {
@@ -96,14 +94,6 @@ public class Attraction
 
  public void setTimings(String timings) {
 	this.timings = timings;
- }
-
- public double getRating() {
-	return rating;
- }
-
- public void setRating(double rating) {
-	this.rating = rating;
  }
 
  public LocalDateTime getCreatedAt() {

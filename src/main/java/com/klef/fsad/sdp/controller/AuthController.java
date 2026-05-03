@@ -6,11 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.klef.fsad.sdp.dto.ApiResponse;
-import com.klef.fsad.sdp.dto.LoginRequest;
-import com.klef.fsad.sdp.dto.EmailRequest;
-import com.klef.fsad.sdp.dto.OTPRequest;
+import com.klef.fsad.sdp.dto.*;
 import com.klef.fsad.sdp.entity.*;
+import com.klef.fsad.sdp.exception.UnauthorizedException;
+import com.klef.fsad.sdp.repository.AdminRepository;
 import com.klef.fsad.sdp.security.JwtUtil;
 import com.klef.fsad.sdp.service.*;
 import com.klef.fsad.sdp.util.EmailService;
@@ -21,172 +20,123 @@ import com.klef.fsad.sdp.util.OTPService;
 @CrossOrigin("*")
 public class AuthController 
 {
-    @Autowired
-    private AdminService adminService;
+    @Autowired private AdminRepository adminRepo;
+    @Autowired private HostService hostService;
+    @Autowired private TouristService touristService;
+    @Autowired private GuideService guideService;
 
-    @Autowired
-    private HostService hostService;
+    @Autowired private JwtUtil jwtUtil;
+    @Autowired private EmailService emailService;
+    @Autowired private OTPService otpService;
 
-    @Autowired
-    private TouristService touristService;
-
-    @Autowired
-    private GuideService guideService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    // ✅ NEW SERVICES
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private OTPService otpService;
-
-    // =========================================================
-    // ✅ SEND OTP
-    // =========================================================
     @PostMapping("/send-otp")
     public ResponseEntity<ApiResponse> sendOTP(@RequestBody EmailRequest request)
     {
         String otp = otpService.generateOTP(request.getEmail());
         emailService.sendOTP(request.getEmail(), otp);
 
-        return ResponseEntity.ok(
-                new ApiResponse("OTP Sent Successfully", "SUCCESS")
-        );
+        return ResponseEntity.ok(new ApiResponse("OTP Sent Successfully", "SUCCESS"));
     }
 
-    // =========================================================
-    // ✅ VERIFY OTP
-    // =========================================================
     @PostMapping("/verify-otp")
     public ResponseEntity<ApiResponse> verifyOTP(@RequestBody OTPRequest request)
     {
-        boolean isValid = otpService.validateOTP(
-                request.getEmail(),
-                request.getOtp()
-        );
+        boolean isValid = otpService.validateOTP(request.getEmail(), request.getOtp());
 
         if (!isValid)
             return ResponseEntity.status(400)
                     .body(new ApiResponse("Invalid or Expired OTP", "FAIL"));
 
-        return ResponseEntity.ok(
-                new ApiResponse("OTP Verified Successfully", "SUCCESS")
-        );
+        return ResponseEntity.ok(new ApiResponse("OTP Verified Successfully", "SUCCESS"));
     }
 
-    // =========================================================
-    // ✅ UNIVERSAL LOGIN WITH OTP VALIDATION
-    // =========================================================
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request)
+    public ResponseEntity<?> login(@RequestBody LoginRequest request)
     {
         String role = request.getRole().toUpperCase();
 
-        switch (role)
-        {
-            // ================= ADMIN =================
-            case "ADMIN":
-                Admin admin = adminService.verifyAdminLogin(
-                        request.getUsername(),
-                        request.getPassword(),
-                        request.getPin()
-                );
+        try {
 
-                if (admin == null)
-                    return ResponseEntity.status(401)
-                            .body(new ApiResponse("Invalid Admin Credentials", "FAIL"));
+            switch (role)
+            {
+                case "ADMIN":
 
-                String adminToken = jwtUtil.generateToken(admin.getUsername(), "ADMIN");
+                    Admin admin = adminRepo.findById(request.getUsername()).orElse(null);
 
-                return ResponseEntity.ok(
-                        new ApiResponse("Login Successful", "SUCCESS",
-                                Map.of("token", adminToken, "user", admin))
-                );
+                    if (admin == null ||
+                        !admin.getPassword().equals(request.getPassword()) ||
+                        !String.valueOf(admin.getPin()).equals(String.valueOf(request.getPin())))
+                    {
+                        return ResponseEntity.status(401)
+                                .body(new ApiResponse("Invalid Admin Credentials", "FAIL"));
+                    }
 
-            // ================= HOST =================
-            case "HOST":
+                    String adminToken = jwtUtil.generateToken(admin.getUsername(), "ADMIN");
 
-                // 🔐 OTP VALIDATION
-                if (!otpService.validateOTP(request.getEmail(), request.getOtp()))
-                {
-                    return ResponseEntity.status(401)
-                            .body(new ApiResponse("OTP Not Verified or Expired", "FAIL"));
-                }
+                    return ResponseEntity.ok(
+                            new ApiResponse("Login Successful", "SUCCESS",
+                                    Map.of("token", adminToken, "role", "ADMIN", "user", admin))
+                    );
 
-                Host host = hostService.login(
-                        request.getEmail(),
-                        request.getPassword()
-                );
+                case "HOST":
+                case "TOURIST":
+                case "GUIDE":
 
-                if (host == null)
-                    return ResponseEntity.status(401)
-                            .body(new ApiResponse("Invalid Host Credentials / Not Approved", "FAIL"));
+                    boolean validOtp = otpService.validateOTP(
+                            request.getEmail(),
+                            request.getOtp()
+                    );
 
-                String hostToken = jwtUtil.generateToken(host.getEmail(), "HOST");
+                    if (!validOtp)
+                        return ResponseEntity.status(401)
+                                .body(new ApiResponse("OTP Not Verified or Expired", "FAIL"));
 
-                return ResponseEntity.ok(
-                        new ApiResponse("Login Successful", "SUCCESS",
-                                Map.of("token", hostToken, "user", host))
-                );
+                    otpService.clearOTP(request.getEmail());
 
-            // ================= TOURIST =================
-            case "TOURIST":
+                    if (role.equals("HOST"))
+                    {
+                        Host host = hostService.login(request.getEmail(), request.getPassword());
 
-                // 🔐 OTP VALIDATION
-                if (!otpService.validateOTP(request.getEmail(), request.getOtp()))
-                {
-                    return ResponseEntity.status(401)
-                            .body(new ApiResponse("OTP Not Verified or Expired", "FAIL"));
-                }
+                        String token = jwtUtil.generateToken(host.getEmail(), "HOST");
 
-                Tourist tourist = touristService.login(
-                        request.getEmail(),
-                        request.getPassword()
-                );
+                        return ResponseEntity.ok(
+                                new ApiResponse("Login Successful", "SUCCESS",
+                                        Map.of("token", token, "role", "HOST", "user", host))
+                        );
+                    }
 
-                if (tourist == null)
-                    return ResponseEntity.status(401)
-                            .body(new ApiResponse("Invalid Tourist Credentials", "FAIL"));
+                    if (role.equals("TOURIST"))
+                    {
+                        Tourist tourist = touristService.login(request.getEmail(), request.getPassword());
 
-                String touristToken = jwtUtil.generateToken(tourist.getEmail(), "TOURIST");
+                        String token = jwtUtil.generateToken(tourist.getEmail(), "TOURIST");
 
-                return ResponseEntity.ok(
-                        new ApiResponse("Login Successful", "SUCCESS",
-                                Map.of("token", touristToken, "user", tourist))
-                );
+                        return ResponseEntity.ok(
+                                new ApiResponse("Login Successful", "SUCCESS",
+                                        Map.of("token", token, "role", "TOURIST", "user", tourist))
+                        );
+                    }
 
-            // ================= GUIDE =================
-            case "GUIDE":
+                    if (role.equals("GUIDE"))
+                    {
+                        Guide guide = guideService.login(request.getEmail(), request.getPassword());
 
-                // 🔐 OTP VALIDATION
-                if (!otpService.validateOTP(request.getEmail(), request.getOtp()))
-                {
-                    return ResponseEntity.status(401)
-                            .body(new ApiResponse("OTP Not Verified or Expired", "FAIL"));
-                }
+                        String token = jwtUtil.generateToken(guide.getEmail(), "GUIDE");
 
-                Guide guide = guideService.login(
-                        request.getEmail(),
-                        request.getPassword()
-                );
+                        return ResponseEntity.ok(
+                                new ApiResponse("Login Successful", "SUCCESS",
+                                        Map.of("token", token, "role", "GUIDE", "user", guide))
+                        );
+                    }
 
-                if (guide == null)
-                    return ResponseEntity.status(401)
-                            .body(new ApiResponse("Invalid Guide Credentials / Not Approved", "FAIL"));
+                default:
+                    return ResponseEntity.badRequest()
+                            .body(new ApiResponse("Invalid Role Selected", "FAIL"));
+            }
 
-                String guideToken = jwtUtil.generateToken(guide.getEmail(), "GUIDE");
-
-                return ResponseEntity.ok(
-                        new ApiResponse("Login Successful", "SUCCESS",
-                                Map.of("token", guideToken, "user", guide))
-                );
-
-            default:
-                return ResponseEntity.badRequest()
-                        .body(new ApiResponse("Invalid Role Selected", "FAIL"));
+        } catch (UnauthorizedException ex) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse(ex.getMessage(), "FAIL"));
         }
     }
 }

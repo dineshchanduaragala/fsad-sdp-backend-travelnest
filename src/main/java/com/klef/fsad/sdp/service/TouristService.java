@@ -1,24 +1,39 @@
 package com.klef.fsad.sdp.service;
 
 import java.util.List;
+import java.util.Map;
+
 import com.klef.fsad.sdp.entity.*;
 
 public interface TouristService 
 {
-    String register(Tourist t);
+    void register(Tourist t);
 
     Tourist login(String email, String password);
 
-    String updateProfile(Tourist t);
+    void updateProfile(Tourist t);
 
-    List<Homestay> viewHomestays();
-
-    List<Homestay> searchHomestays(String location);
-
-    List<Attraction> viewAttractions();
     Tourist getTouristById(int id);
 
-    List<Attraction> searchAttractions(String location);
+    // ================= HOMESTAYS =================
+    List<Homestay> viewHomestays();
+    Homestay getHomestayById(int id);
 
+    // ================= ATTRACTIONS =================
+    List<Attraction> viewAttractions();
+
+    // ================= GUIDES =================
     List<Guide> viewGuides();
+    Guide getGuideById(int id);
+
+    void sendGuideRequest(GuideRequest req);
+
+    // ================= BOOKINGS =================
+    void createBooking(Booking b);
+
+    List<Booking> getBookingsByTourist(int touristId);
+    void cancelBooking(int bookingId);
+
+    // ================= DASHBOARD =================
+    Map<String, Object> getDashboardData(int touristId);
 }

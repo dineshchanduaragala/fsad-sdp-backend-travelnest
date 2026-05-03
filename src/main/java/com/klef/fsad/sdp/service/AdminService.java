@@ -1,60 +1,56 @@
 package com.klef.fsad.sdp.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.klef.fsad.sdp.entity.*;
 
 public interface AdminService 
 {
-    // ===================== AUTH =====================
-    Admin verifyAdminLogin(String username, String password, String pin);
+	
+	Admin validateAdminLogin(String username, String password, Integer pin);
+    // ================= DASHBOARD =================
+    Map<String, Long> getDashboardStats();
 
-    // ===================== DASHBOARD =====================
-    long getTotalTourists();
-    long getTotalHosts();
-    long getTotalGuides();
-    long getTotalHomestays();
-    long getTotalAttractions();
-    long getTotalBookings();
-    
+    // ================= TOURISTS =================
     List<Tourist> getAllTourists();
-    String updateHost(Host h);
-    String deleteHost(int id);
-
-    // ===================== TOURISTS =====================
-    List<Tourist> viewAllTourists();
     String updateTourist(Tourist t);
     String deleteTourist(int id);
 
-    // ===================== HOST MANAGEMENT =====================
-    List<Host> getAllHosts();
-    List<Host> getPendingHosts();
+    // ================= HOSTS =================
+    List<Host> getAllHosts();            // ✅ ALL hosts
+    List<Host> getPendingHosts();        // ✅ approved = false
     String approveHost(int id);
     String rejectHost(int id);
+    String updateHost(Host h);
+    String deleteHost(int id);
 
-    // ===================== GUIDE MANAGEMENT =====================
+    // ================= GUIDES =================
     List<Guide> getAllGuides();
     List<Guide> getPendingGuides();
     String approveGuide(int id);
     String rejectGuide(int id);
+    String updateGuide(Guide g);
+    String deleteGuide(int id);
 
-    // ===================== HOMESTAY MANAGEMENT =====================
+    // ================= HOMESTAYS =================
     List<Homestay> getAllHomestays();
     List<Homestay> getPendingHomestays();
-    String addHomestay(Homestay h);        // Admin adds → auto approve
+    String addHomestay(Homestay h);
     String updateHomestay(Homestay h);
     String deleteHomestay(int id);
     String approveHomestay(int id);
     String rejectHomestay(int id);
+    Homestay getHomestayById(int id);
 
-    // ===================== ATTRACTION MANAGEMENT =====================
+    // ================= ATTRACTIONS =================
     List<Attraction> getAllAttractions();
+    Attraction getAttractionById(int id);
     String addAttraction(Attraction a);
     String updateAttraction(Attraction a);
     String deleteAttraction(int id);
 
-    // ===================== BOOKING MANAGEMENT =====================
+    // ================= BOOKINGS =================
     List<Booking> getAllBookings();
-    List<Booking> getBookingsByStatus(String status);
-    List<Booking> getBookingsByPaymentStatus(String paymentStatus);
+    String updateBookingStatus(int id, String status);
 }

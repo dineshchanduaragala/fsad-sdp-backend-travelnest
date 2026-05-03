@@ -7,39 +7,83 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
-public class JwtFilter extends OncePerRequestFilter
-{
- @Autowired
- private JwtUtil jwtUtil;
+public class JwtFilter extends OncePerRequestFilter {
 
- @Override
- protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-         throws ServletException, IOException
- {
-  String header = request.getHeader("Authorization");
+    @Autowired
+    private JwtUtil jwtUtil;
 
-  if(header != null && header.startsWith("Bearer "))
-  {
-   String token = header.substring(7);
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain)
+            throws ServletException, IOException {
 
-   if(jwtUtil.validateToken(token))
-   {
-    String username = jwtUtil.extractUsername(token);
+        String path = request.getServletPath();
 
-    // ✅ THIS IS THE MAIN FIX
-    UsernamePasswordAuthenticationToken auth =
-        new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
+        // ✅ 1. Allow CORS preflight requests
+        if (HttpMethod.OPTIONS.matches(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            chain.doFilter(request, response);
+            return;
+        }
 
-    SecurityContextHolder.getContext().setAuthentication(auth);
-   }
-  }
+        // ✅ 2. Skip JWT for PUBLIC endpoints
+        if (path.equals("/") ||
+            path.startsWith("/error") ||
 
-  chain.doFilter(request, response);
- }
+            // AUTH
+            path.startsWith("/auth") ||
+            path.contains("/login") ||
+            path.contains("/register") ||
+
+            // SWAGGER
+            path.startsWith("/swagger-ui") ||
+            path.startsWith("/v3/api-docs") ||
+
+            // PUBLIC APIs (optional)
+            path.startsWith("/homestayapi") ||
+            path.startsWith("/attractionapi")
+        ) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // ✅ 3. Extract JWT token
+        String header = request.getHeader("Authorization");
+
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+
+            try {
+                if (jwtUtil.validateToken(token)) {
+
+                    String username = jwtUtil.extractUsername(token);
+
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    username,
+                                    null,
+                                    Collections.emptyList()
+                            );
+
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+
+            } catch (Exception e) {
+                // ❌ Invalid token → return 401
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+        }
+
+        // ✅ 4. Continue filter chain
+        chain.doFilter(request, response);
+    }
 }
